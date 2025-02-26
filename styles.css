@@ -1,0 +1,204 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #1ec039;
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #0277bd;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #333;
+    font-size: 16px;
+}
+
+/* Dashboard */
+.dashboard {
+    background: #cfd8dc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.links a {
+    display: block;
+    margin: 10px 0;
+    color: #0277bd;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Forms */
+textarea, input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #0277bd;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #01579b;
+}
+
+/* Post Section */
+#postsContainer {
+    margin-top: 20px;
+}
+
+.post {
+    background: #f1f1f1;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.post img {
+    max-width: 100%;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Navigation */
+nav {
+    background-color: #0277bd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin: 5px;
+    display: inline-block;
+    font-size: 18px;
+}
+
+nav a:hover {
+    background-color: #01579b;
+    border-radius: 5px;
+}
+
+/* Page Specific Styling */
+.hydroponics, .aquaponics, .nutrients, .water_quality, .lighting, .temperature, .air, .build_hydroponics {
+    padding: 20px;
+}
+
+.hydroponics h2, .aquaponics h2, .nutrients h2, .water_quality h2, .lighting h2, .temperature h2, .air h2, .build_hydroponics h2 {
+    color: #0288d1;
+}
+
+.hydroponics p, .aquaponics p, .nutrients p, .water_quality p, .lighting p, .temperature p, .air p, .build_hydroponics p {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+#progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 10px;
+    background-color: #bd0291;
+    width: 100%;
+    display: flex; 
+}
+
+.progress-step {
+    flex: 1;
+    height: 100%;
+    border-right: 2px solid #fff;
+    background-color: #e0e0e0; 
+}
+
+.progress-step:last-child {
+    border-right: none; 
+}
+
+.progress-step.completed {
+    background-color: #6a1b9a; 
+}
+
+body.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.button:hover {
+    background-color: #bd0291; 
+}
+
+.footer {
+    background-color: #02bd9e;
+    color: #fff; 
+    text-align: center; 
+    padding: 15px 0;
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 14px; 
+    z-index: 1000;  
+}
+
+html, body {
+    height: 0%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1; 
+}
+
+.footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #bd0291;
+    text-decoration: underline;
+}
+
+body {
+    padding-bottom: 50px;
+}
