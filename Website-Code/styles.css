@@ -36,6 +36,9 @@ html {
 body {
     background: var(--bg-color);
     color: var(--text-color);
+    margin: 0px;
+    padding-top: 80px;
+    padding-bottom: 80px;
 }
 
 /* General styling */
