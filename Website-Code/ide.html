@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydroponic Programming Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>🌿 Learn how to code with Blockly 🌞</h1>
+
+    <div id="ide-container">
+    <div id="blocklyDiv"></div>
+    <div id="output-panel">
+        
+        <h2>🌻 Garden Control Center</h2>
+
+    <div class="sensor-card">
+        <div class="tooltip">💧 Water Level: <span id="water-level" class="sensor-value">500</span>/1000
+            <span class="tooltiptext">Plants need water between 300-800 for happy growth!</span>
+        </div>
+        <div class="progress-bar"><div id="water-progress" class="progress-fill" style="width: 50%;"></div></div>
+    </div>
+
+    <div class="sensor-card">
+        <div class="tooltip">☀️ Light Level: <span id="light-level" class="sensor-value">700</span>/1000
+            <span class="tooltiptext">Plants need light >500 during day time!</span>
+        </div>
+        <div class="progress-bar"><div id="light-progress" class="progress-fill" style="width: 70%;"></div></div>
+    </div>
+
+    <div class="sensor-card">
+        <div class="tooltip">🧪 pH Level: <span id="ph-level" class="sensor-value">6.5</span>
+            <span class="tooltiptext">Perfect pH is between 5.5-6.5 for most plants!</span>
+        </div>
+        <div class="progress-bar"><div id="ph-progress" class="progress-fill" style="width: 46%;"></div></div>
+    </div>
+
+    <div class="sensor-card">
+        <div class="tooltip">🌡️ Temperature: <span id="temp-level" class="sensor-value">22</span>°C
+            <span class="tooltiptext">Ideal temperature is 18-25°C for happy plants!</span>
+        </div>
+        <div class="progress-bar"><div id="temp-progress" class="progress-fill" style="width: 44%;"></div></div>
+    </div>
+
+    <div class="sensor-card">
+        <div class="tooltip">💨 Humidity: <span id="humidity-level" class="sensor-value">65</span>%
+            <span class="tooltiptext">Plants like humidity between 40-70%!</span>
+        </div>
+        <div class="progress-bar"><div id="humidity-progress" class="progress-fill" style="width: 65%;"></div></div>
+    </div>
+
+    <div class="sensor-card">
+        <div class="tooltip">🧂 Nutrients: <span id="nutrient-level" class="sensor-value">450</span>/1000
+            <span class="tooltiptext">Nutrients should be between 300-700 for best growth!</span>
+        </div>
+        <div class="progress-bar"><div id="nutrient-progress" class="progress-fill" style="width: 45%;"></div></div>
+    </div>
+
+    <div class="device-card">
+        <h3>⚙️ Devices</h3>
+        <p>🚰 Water Pump: <span id="pump-indicator" class="status-indicator status-off"></span><span id="pump-status">OFF</span></p>
+        <p>💡 Grow Light: <span id="light-indicator" class="status-indicator status-off"></span><span id="light-status">OFF</span></p>
+        <p>💨 Fan: <span id="fan-indicator" class="status-indicator status-off"></span><span id="fan-status">OFF</span></p>
+        <p>🧪 Nutrient Mixer: <span id="mixer-indicator" class="status-indicator status-off"></span><span id="mixer-status">OFF</span></p>
+    </div>
+
+    <div class="device-card">
+        <h3>🌱 Plants</h3>
+        <div id="plant-display">
+            <p><span class="plant-type">Lettuce:</span> <span id="lettuce-health">90</span>% healthy</p>
+        <div class="plant-health">
+            <span>Health:</span>
+            <div class="health-bar"><div id="lettuce-health-bar" class="health-fill" style="width: 90%;"></div></div>
+        </div>
+        </div>
+    </div>
+
+    <div class="device-card">
+        <h3>⛅ Environment</h3>
+        <p><span id="weather-icon" class="weather-icon">☀️</span> <span id="weather-status">Sunny</span></p>
+        <p>⏱️ <span id="time-display">Day 1, 12:00 PM</span></p>
+    </div>
+
+    <div id="simulation">
+        <div class="water" id="water" style="height: 50%;"></div>
+        <div class="plant" id="plant1" style="left: 20%; height: 60px;"></div>
+        <div class="plant" id="plant2" style="left: 40%; height: 70px;"></div>
+        <div class="plant" id="plant3" style="left: 60%; height: 50px;"></div>
+        <div class="plant" id="plant4" style="left: 80%; height: 65px;"></div>
+        <div class="sun" id="sun"></div>
+        <div class="cloud" id="cloud1" style="left: 10%;"></div>
+        <div class="cloud" id="cloud2" style="left: 60%; width: 80px;"></div>
+    </div>  
+    <h3>📝 Event Log</h3>
+        <div id="event-log" class="event-log"></div>
+
+        <div>
+            <button id="run-btn">▶ Run Program</button>
+            <button id="stop-btn">■ Stop</button>
+            <button id="demo-btn">Load Demo</button>
+            <button id="clear-btn">🧹 Clear Log</button>
+            <button id="harvest-btn">🌱 Harvest</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blockly and dependencies -->
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
+    <script src="ide.js"></script>
+</body>
+</html>
