@@ -957,3 +957,767 @@ button:hover {
     font-size: 2rem;
     color: #333;
 }
+
+/* IDE styling */
+
+#ide-container {
+    display: flex;
+    height: 85vh;
+    gap: 20px;
+}  
+
+#blocklyDiv {
+    flex: 3;
+    height: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#output-panel {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+
+#simulation {
+    width: 100%;
+    height: 250px;
+    background-color: #e0f7fa;
+    border-radius: 8px;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.plant {
+    position: absolute;
+    bottom: 20px;
+    width: 40px;
+    height: 60px;
+    background-color: #4caf50;
+    border-radius: 20px 20px 0 0;
+    transition: height 0.5s;
+}
+
+.water {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #00bcd4;
+    transition: height 0.5s;
+}
+
+.sun {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #ffeb3b;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #ffeb3b;
+    transition: all 0.5s;
+}
+
+.cloud {
+    position: absolute;
+    top: 30px;
+    width: 60px;
+    height: 30px;
+    background-color: #eceff1;
+    border-radius: 30px;
+    opacity: 0.7;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+    font-family: 'Comic Sans MS', cursive;
+}
+
+button:hover {
+    background-color: #388e3c;
+}
+
+.sensor-value {
+    font-weight: bold;
+    color: #2196f3;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-on {
+    background-color: #4caf50;
+    box-shadow: 0 0 5px #4caf50;
+}
+
+.status-off {
+    background-color: #f44336;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 5px;
+    background: #e8f5e9;
+    border-radius: 5px;
+    border-left: 4px solid #4caf50;
+}
+
+.sensor-card {
+    background: #e3f2fd;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #bbdefb;
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #2196f3;
+    width: 50%;
+}
+
+h1 {
+    color: #2e7d32;
+    text-align: center;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.device-card {
+    background: #e8f5e9;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    border-left: 4px solid #4caf50;
+}
+
+.weather-icon {
+    font-size: 24px;
+    margin-right: 5px;
+}
+
+.plant-health {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.health-bar {
+    flex-grow: 1;
+    height: 10px;
+    background: #ffcdd2;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.health-fill {
+    height: 100%;
+    background: #4caf50;
+    border-radius: 5px;
+    width: 80%;
+}
+
+.event-log {
+    max-height: 150px;
+    overflow-y: auto;
+    background: #f5f5f5;
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.event-entry {
+    margin: 3px 0;
+    padding: 3px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-right: 5px;
+    color: white;
+}
+
+.badge-info {
+    background: #2196f3;
+}
+
+.badge-success {
+    background: #4caf50;
+}
+
+.badge-warning {
+    background: #ff9800;
+}
+
+.badge-danger {
+    background: #f44336;
+}
+
+.badge-weather {
+    background: #00bcd4;
+}
+
+.badge-plant {
+    background: #8bc34a;
+}
+
+.badge-system {
+    background: #607d8b;
+}
+
+.plant-type {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+/* Puzzle styling */
+/* Page Title */
+.page-title {
+    font-size: 3.2rem;
+    text-align: center;
+    color: var(--main-color);
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+    text-shadow: 1px 1px 2px var(--shadow-color);
+}
+
+/* Puzzles Container */
+.puzzles-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+    padding: 3rem 1rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Base Puzzle Game Styles */
+.puzzle-game {
+    width: 100%;
+    max-width: 900px;
+    background: var(--white-color);
+    border-radius: 1rem;
+    box-shadow: 0 .1rem .5rem var(--shadow-color);
+    border-top: .8rem solid var(--main-color);
+    margin: 0 auto;
+    padding: 2.5rem;
+}
+
+/* Default Puzzle Grid (5 columns) */
+.puzzle-game .piece-bin,
+.puzzle-game .puzzle-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: .5rem;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Individual Puzzle Sizing */
+
+/* Puzzle 1 (15 pieces - 5 columns) */
+.puzzle-game[data-piece-count="15"] .puzzle-piece,
+.puzzle-game[data-piece-count="15"] .slot {
+    width: 140px;
+    height: 140px;
+}
+
+/* Puzzle 2 (25 pieces - 5 columns) */
+.puzzle-game[data-piece-count="25"] .puzzle-piece,
+.puzzle-game[data-piece-count="25"] .slot {
+    width: 120px;
+    height: 120px;
+}
+
+/* Puzzle 3 (35 pieces - 7 columns) */
+.puzzle-game[data-piece-count="35"] .puzzle-piece,
+.puzzle-game[data-piece-count="35"] .slot {
+    width: 80px;
+    height: 80px;
+}
+
+.puzzle-game[data-piece-count="35"] .piece-bin,
+.puzzle-game[data-piece-count="35"] .puzzle-board {
+    grid-template-columns: repeat(7, 1fr);
+}
+
+/* Puzzle 4 - 10 (45 pieces - 9 columns) */
+.puzzle-game[data-piece-count="45"] .piece-bin,
+.puzzle-game[data-piece-count="45"] .puzzle-board {
+    grid-template-columns: repeat(9, 1fr); 
+    padding: 1rem;
+}
+
+.puzzle-game[data-piece-count="45"] .puzzle-piece,
+.puzzle-game[data-piece-count="45"] .slot {
+    width: 60px; 
+    height: 60px;
+    min-width: 60px; 
+}
+
+/* Ensure proper scaling of images */
+.puzzle-piece img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fills the container */
+    object-position: center; /* Centers the image, cropping symmetrically */
+}
+
+/* Prevent clipping */
+.puzzle-piece {
+    overflow: visible; /* Allows content to extend beyond the container */
+}
+
+.piece-bin,
+.puzzle-board {
+    overflow: visible; /* Ensures parent elements don't clip content */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); /* Flexible column sizing */
+    gap: 0; /* Remove gaps between puzzle pieces */
+    padding: 0; /* Remove padding that might affect layout */
+}
+
+/* Common Puzzle Elements */
+.puzzle-game h3 {
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.puzzle-game h3 span {
+    color: var(--main-color);
+}
+
+.reference-section {
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.reference-image {
+    max-width: 100%;
+    border-radius: .5rem;
+    border: 2px solid var(--main-color);
+    cursor: pointer;
+    transition: transform 0.2s;
+    max-height: 350px;
+}
+
+.reference-image:hover {
+    transform: scale(1.02);
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2.5rem 0;
+}
+
+.start-btn, .reset-btn {
+    padding: 1.3rem 2.6rem;
+    background: var(--main-color);
+    color: var(--white-color);
+    border-radius: .5rem;
+    cursor: pointer;
+    font-size: 1.7rem;
+    transition: all 0.3s;
+}
+
+.start-btn:hover, .reset-btn:hover {
+    background: #047214;
+    transform: translateY(-.2rem);
+    box-shadow: 0 .2rem .5rem var(--shadow-color);
+}
+
+.start-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin: 2.5rem 0;
+    font-size: 1.7rem;
+}
+
+.puzzle-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    width: 100%;
+    padding-bottom: 2rem;
+}
+
+.piece-bin {
+    background: rgba(5, 134, 22, 0.05);
+    border: 2px dashed var(--main-color);
+    min-height: 200px;
+}
+
+.puzzle-board {
+    background: rgba(5, 134, 22, 0.03);
+    border: 2px solid var(--main-color);
+}
+
+.puzzle-piece {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: grab;
+    transition: transform 0.2s;
+    box-shadow: 0 .1rem .3rem var(--shadow-color);
+}
+
+.puzzle-piece:hover {
+    transform: scale(1.03);
+    z-index: 10;
+}
+
+.slot {
+    background: rgba(5, 134, 22, 0.1);
+    transition: background 0.3s;
+}
+
+.slot:hover {
+    background: rgba(5, 134, 22, 0.2);
+}
+
+.puzzle-messages {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.success-message {
+    font-size: 2rem;
+    color: var(--main-color);
+    margin-bottom: 2rem;
+    display: none;
+}
+
+/* Badges Container */
+.badges-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: var(--white-color);
+    border-radius: 1rem;
+    box-shadow: 0 .1rem .5rem var(--shadow-color);
+    border-top: .8rem solid var(--main-color);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.badges-container h3 {
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    color: var(--main-color);
+    margin-bottom: 1.5rem;
+}
+
+.badges-container .badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem;
+    padding: 1rem;
+    background: rgba(5, 134, 22, 0.05);
+    border-radius: .5rem;
+    transition: transform 0.3s;
+}
+
+.badges-container .badge:hover {
+    transform: translateY(-.5rem);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.badges-container .badge img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: .5rem;
+}
+
+.badges-container .badge span {
+    font-size: 1.4rem;
+    color: var(--text-color);
+}
+
+/* Badges Container - Ordered Layout */
+.badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.badge {
+    order: 999;
+}
+
+/* Set explicit order for each puzzle badge */
+.badge[data-puzzle-id="1"] { order: 1; }
+.badge[data-puzzle-id="2"] { order: 2; }
+.badge[data-puzzle-id="3"] { order: 3; }
+.badge[data-puzzle-id="4"] { order: 4; }
+.badge[data-puzzle-id="5"] { order: 5; }
+.badge[data-puzzle-id="6"] { order: 6; }
+.badge[data-puzzle-id="7"] { order: 7; }
+.badge[data-puzzle-id="8"] { order: 8; }
+.badge[data-puzzle-id="9"] { order: 9; }
+.badge[data-puzzle-id="10"] { order: 10; }
+.badge[data-puzzle-id="11"] { order: 11; } /* Victory badge */
+
+/* Overlay Styles */
+#referenceOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+#referenceOverlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.overlay-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.overlay-image {
+    max-width: 100%;
+    max-height: 80vh;
+    border: .3rem solid var(--white-color);
+    border-radius: 1rem;
+    transition: transform 0.2s;
+    transform-origin: center center;
+    cursor: zoom-in;
+}
+
+.close-btn {
+    position: absolute;
+    top: -1.5rem;
+    right: -1.5rem;
+    width: 4rem;
+    height: 4rem;
+    font-size: 2rem;
+    color: var(--white-color);
+    background: #e74c3c;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s;
+}
+
+.close-btn:hover {
+    background: #c0392b;
+}
+
+.error-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    color: #e74c3c;
+    animation: fadeError 1s;
+    z-index: 1001;
+    pointer-events: none;
+    text-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeError {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+    background: var(--main-color);
+    color: var(--white-color);
+    text-align: center;
+    font-size: 1.4rem;
+    z-index: 100;
+}
+
+/* Responsive Design - LOCKED GRID LAYOUT */
+@media (max-width: 1200px) {
+    .puzzle-game {
+        max-width: 800px;
+    }
+    
+    /* Scale down all puzzle pieces uniformly */
+    .puzzle-game .puzzle-piece,
+    .puzzle-game .slot {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 992px) {
+    html {
+        font-size: 55%;
+    }
+    
+    .puzzle-game {
+        max-width: 700px;
+    }
+    
+    /* Further scale down */
+    .puzzle-game .puzzle-piece,
+    .puzzle-game .slot {
+        width: 85px;
+        height: 85px;
+    }
+}
+
+@media (max-width: 768px) {
+    .puzzle-game {
+        max-width: 600px;
+    }
+    
+    .puzzle-game .puzzle-piece,
+    .puzzle-game .slot {
+        width: 75px;
+        height: 75px;
+    }
+
+    /* Adjust badges for smaller screens */
+    .badges-container .badge {
+        margin: 0.5rem;
+    }
+    
+    .badges-container .badge img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .badges-container .badge span {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .puzzle-game {
+        max-width: 450px;
+    }
+    
+    .puzzle-game .puzzle-piece,
+    .puzzle-game .slot {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+@media (max-width: 480px) {
+    .puzzle-game {
+        padding: 1.5rem;
+        max-width: 350px;
+    }
+    
+    .page-title {
+        font-size: 2.4rem;
+    }
+    
+    .puzzle-game .puzzle-piece,
+    .puzzle-game .slot {
+        width: 55px;
+        height: 55px;
+    }
+    
+    /* Stack buttons vertically on small screens */
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}
