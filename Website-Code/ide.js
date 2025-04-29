@@ -2325,3 +2325,19 @@ const hydroponicSystem = {
 window.addEventListener('load', function() {
   hydroponicSystem.init();
 });
+
+// Dark Mode
+  const darkModeToggle = document.getElementById("darkMode-icon");
+    darkModeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    });
+
+    // Apply saved preference
+    window.addEventListener('DOMContentLoaded', () => {
+      const isDarkMode = localStorage.getItem("darkMode") === "true";
+      if (isDarkMode) {
+        document.body.classList.add("dark-mode");
+      }
+      document.getElementById("year").textContent = new Date().getFullYear();
+    });
