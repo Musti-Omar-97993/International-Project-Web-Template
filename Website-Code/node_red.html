@@ -30,7 +30,7 @@
         <div class="container">
             <div class="section">
                 <div class="node-red-img">
-                    <img src="images/placeholder_resized.PNG" alt="">
+                    <img src="images/node_red_resized.webp" alt="">
                 </div>
                 <div>
                     <h1>Introduction to Node-RED</h1>
@@ -50,40 +50,40 @@
         </div>
      </section>
 
-     <section class="ECSensor" id="ECSensor">
+     <section class="mqtt-node-red" id="mqtt-node-red">
         <div class="container">
             <div class="section">
                 <div>
-                    <h2>EC Sensor</h2>
-                    <p>This sensor measures the electrical conductivity (EC) of water to determine how many nutrients are present.</p>
+                    <h2>Connecting MQTT with Node-RED</h2>
+                    <p>MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol ideal for IoT communication. It allows devices like the ESP32 to publish sensor data to Node-RED in real time.</p>
                 </div>
-                 <div class="node-red-img">
-                    <img src="images/placeholder_resized.PNG" alt="">
+                <div class="node-red-img">
+                    <img src="images/connect-to-broker_resized.png" alt="MQTT with Node-RED">
                 </div>
                 <div class="node-red-content">
-                    <h2>How to connect:</h2>
+                    <h2>How to Set It Up:</h2>
                     <ol>
-                        <li>Attach the EC sensor probe to its signal board.</li>
-                        <li>Connect the signal wire to an analog input on the ESP32.</li>
-                        <li>Power the EC sensor by connecting it to 3.3V/5V and ground.</li>
+                        <li>Install an MQTT broker like Mosquitto on your local server or use a cloud broker (e.g., HiveMQ).</li>
+                        <li>Configure the ESP32 to connect to the broker and publish sensor data to a topic (e.g., <code>hydroponics/ec</code>).</li>
+                        <li>In Node-RED, drag in an MQTT input node and subscribe to the same topic.</li>
+                        <li>Connect the MQTT node to a debug or chart node to visualize data.</li>
                     </ol>
-                    <h2>How to use with Node-RED:</h2>
-                    <ol>
-                        <li>Program the ESP32 to read EC values and send them to Node-RED via MQTT.</li>
-                        <li>In Node-RED, create a visual graph to monitor changes over time.</li>
-                        <li>Use function nodes to send alerts if the EC level is too high or too low.</li>
-                    </ol>
+                    <h2>Why Use MQTT:</h2>
+                    <ul>
+                        <li>Efficient communication over low bandwidth.</li>
+                        <li>Real-time updates from multiple sensors.</li>
+                        <li>Supports two-way communication between devices and dashboards.</li>
                     </ul>
                 </div>
             </div>
         </div>
-     </section>
+    </section>    
 
      <section class="WaterLevelSensor" id="WaterLevelSensor">
         <div class="container">
             <div class="section">
                 <div class="node-red-img">
-                    <img src="images/placeholder_resized.PNG" alt="">
+                    <img src="images/WaterLevelSensor_resized.png" alt="">
                 </div>
                 <div>
                     <h2>Water Level Sensor</h2>
@@ -107,15 +107,44 @@
         </div>
      </section>
 
-     <section class="WaterFlowSensor" id="WaterFlowSensor">
+     <section class="ECSensor" id="ECSensor">
         <div class="container">
             <div class="section">
                 <div>
+                    <h2>EC Sensor</h2>
+                    <p>This sensor measures the electrical conductivity (EC) of water to determine how many nutrients are present.</p>
+                </div>
+                 <div class="node-red-img">
+                    <img src="images/ECSensor_resized.png" alt="">
+                </div>
+                <div class="node-red-content">
+                    <h2>How to connect:</h2>
+                    <ol>
+                        <li>Attach the EC sensor probe to its signal board.</li>
+                        <li>Connect the signal wire to an analog input on the ESP32.</li>
+                        <li>Power the EC sensor by connecting it to 3.3V/5V and ground.</li>
+                    </ol>
+                    <h2>How to use with Node-RED:</h2>
+                    <ol>
+                        <li>Program the ESP32 to read EC values and send them to Node-RED via MQTT.</li>
+                        <li>In Node-RED, create a visual graph to monitor changes over time.</li>
+                        <li>Use function nodes to send alerts if the EC level is too high or too low.</li>
+                    </ol>
+                    </ul>
+                </div>
+            </div>
+        </div>
+     </section>
+
+     <section class="WaterFlowSensor" id="WaterFlowSensor">
+        <div class="container">
+            <div class="section">
+                <div class="node-red-img">
+                    <img src="images/WaterFlowSensor_resized.png" alt="">
+                </div>
+                <div>
                     <h2>Water Flow Rate Sensor</h2>
                     <p>Measures the flow of water to monitor irrigation efficiency and detect blockages or leaks.</p>
-                </div>
-                <div class="node-red-img">
-                    <img src="images/placeholder_resized.PNG" alt="">
                 </div>
                 <div class="node-red-content">
                     <h2>How to connect:</h2>
@@ -135,6 +164,36 @@
             </div>
         </div>
      </section>   
+
+     <section class="whatsapp-alerts" id="whatsapp-alerts">
+        <div class="container">
+            <div class="section">
+                <div>
+                    <h2>Sending WhatsApp Alerts in Node-RED</h2>
+                    <p>You can configure Node-RED to send automated alerts to WhatsApp using third-party APIs like Twilio, CallMeBot, or WhatsApp Business API.</p>
+                </div>
+                <div class="node-red-img">
+                    <img src="images/whatsappAlertNode.png" alt="WhatsApp Alerts">
+                </div>
+                <div class="node-red-content">
+                    <h2>Steps to Integrate:</h2>
+                    <ol>
+                        <li>Create an account with a WhatsApp API provider (e.g., <a href="https://www.callmebot.com/">CallMeBot</a>).</li>
+                        <li>Get your API key and phone number linked to WhatsApp.</li>
+                        <li>In Node-RED, use the HTTP request node to send messages to the API endpoint.</li>
+                        <li>Trigger the alert from a function node when sensor values go out of range.</li>
+                    </ol>
+                    <h2>Use Cases:</h2>
+                    <ul>
+                        <li>Notify users if EC or pH values exceed safe levels.</li>
+                        <li>Alert when the water pump fails or tank is low.</li>
+                        <li>Send daily summaries of hydroponic conditions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <a href="#" class="top">Back to Top &#8593;</a>
 
     <!-- footer design-->

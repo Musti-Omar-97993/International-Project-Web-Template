@@ -37,8 +37,7 @@ body {
     background: var(--bg-color);
     color: var(--text-color);
     margin: 0px;
-    padding-top: 80px;
-    padding-bottom: 80px;
+    
 }
 
 /* General styling */
@@ -345,6 +344,7 @@ button:hover {
 	font-size: 70px;
     text-align: center;
     padding-top: 100px;
+    color: var(--white-color);
 }
 
 .content-h2 {
@@ -370,11 +370,11 @@ button:hover {
 }
 
 .paragraph a {
-    color: var(--secondary-color);
+    color: var(--main-color);
 }
 
 .paragraph2 a {
-    color: var(--main-color);
+    color: var(--secondary-color);
 }
 
 .paragraph p{
@@ -604,12 +604,12 @@ button:hover {
 
 .team-slide h3 {
     font-size: 2.5rem;
-    margin: 1.4rem 0;
+    margin: 1.1rem 0;
 }
 
 .team-slide h2 {
     font-size: 1.5rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.1rem;
 }
 
 .team-info  h4{
@@ -866,7 +866,7 @@ button:hover {
 }
 
 /* 
-    IDE Styling 
+    Playground navigation Styling 
 */
 
 .ideNavigation {
@@ -882,6 +882,7 @@ button:hover {
 .ideNavigation .ideNavigation-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     align-items: center;
     gap: 2rem;
 }
@@ -962,6 +963,11 @@ button:hover {
 }
 
 /* IDE styling */
+
+.ideBody {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
 
 #ide-container {
     display: flex;
@@ -1254,7 +1260,7 @@ h1 {
 .puzzle-game {
     width: 100%;
     max-width: 900px;
-    background: var(--white-color);
+    background: var(--bg-color);
     border-radius: 1rem;
     box-shadow: 0 .1rem .5rem var(--shadow-color);
     border-top: .8rem solid var(--main-color);
@@ -1465,7 +1471,7 @@ h1 {
     max-width: 900px;
     margin: 4rem auto;
     padding: 2rem;
-    background: var(--white-color);
+    background: var(--bg-color);
     border-radius: 1rem;
     box-shadow: 0 .1rem .5rem var(--shadow-color);
     border-top: .8rem solid var(--main-color);

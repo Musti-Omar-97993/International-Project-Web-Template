@@ -5,88 +5,88 @@ const questions = [
             {text: "Flow-based visual programming", correct: true},
             {text: "Video editing", correct: false},
             {text: "Gaming applications", correct: false},
-            {text: "Text processing", correct: false},
+            {text: "Text processing", correct: false}
         ]
     },
     {
-        question: "How does Node-RED help in hydroponic systems?",
+        question: "Which microcontroller is commonly used with Node-RED for sensor integration?",
         answers: [
-            {text: "By watering plants manually", correct: false},
-            {text: "By automating sensor data collection and control", correct: true},
-            {text: "By heating the water", correct: false},
-            {text: "By planting seeds", correct: false},
+            {text: "Raspberry Pi Pico", correct: false},
+            {text: "Arduino Uno", correct: false},
+            {text: "ESP32", correct: true},
+            {text: "BeagleBone", correct: false}
         ]
     },
     {
-        question: "Which device is commonly integrated with Node-RED in hydroponic setups?",
+        question: "What role does MQTT play in a Node-RED hydroponics system?",
         answers: [
-            {text: "PlayStation 5", correct: false},
-            {text: "ESP32 microcontroller", correct: true},
-            {text: "Kitchen oven", correct: false},
-            {text: "Electric fan", correct: false},
+            {text: "It edits HTML content", correct: false},
+            {text: "It transmits sensor data in real-time", correct: true},
+            {text: "It stores images from sensors", correct: false},
+            {text: "It powers the sensors", correct: false}
         ]
     },
     {
-        question: "What does the EC sensor measure?",
+        question: "What type of node in Node-RED allows you to subscribe to an MQTT topic?",
         answers: [
-            {text: "The temperature of water", correct: false},
-            {text: "The electrical conductivity to determine nutrient levels", correct: true},
-            {text: "The pressure inside the water pipes", correct: false},
-            {text: "The amount of light hitting the plants", correct: false},
+            {text: "MQTT input node", correct: true},
+            {text: "Function node", correct: false},
+            {text: "Template node", correct: false},
+            {text: "CSV node", correct: false}
         ]
     },
     {
-        question: "Where should the EC sensor signal wire be connected on the ESP32?",
+        question: "Which sensor helps determine nutrient levels in hydroponic water?",
         answers: [
-            {text: "To a digital output pin", correct: false},
-            {text: "To a Wi-Fi antenna", correct: false},
-            {text: "To an analog input pin", correct: true},
-            {text: "To the battery terminal", correct: false},
+            {text: "Water level sensor", correct: false},
+            {text: "Temperature sensor", correct: false},
+            {text: "Flow rate sensor", correct: false},
+            {text: "EC sensor", correct: true}
         ]
     },
     {
-        question: "What happens when the water level sensor detects low water in Node-RED?",
+        question: "How does the water level sensor communicate its readings to Node-RED?",
         answers: [
-            {text: "It starts a music playlist", correct: false},
-            {text: "It triggers an automated water pump control", correct: true},
-            {text: "It shuts down the system immediately", correct: false},
-            {text: "It changes the color of the lights", correct: false},
+            {text: "Via the ESP32 sending data to Node-RED", correct: true},
+            {text: "By flashing LED lights", correct: false},
+            {text: "Through USB connection", correct: false},
+            {text: "By writing data to a text file", correct: false}
         ]
     },
     {
-        question: "Where should you install the water level sensor?",
+        question: "What is one function of the water flow rate sensor in hydroponics?",
         answers: [
-            {text: "Inside the lighting system", correct: false},
-            {text: "Attached to the side of the water tank", correct: true},
-            {text: "In the soil of the plants", correct: false},
-            {text: "On top of the greenhouse roof", correct: false},
+            {text: "To monitor light levels", correct: false},
+            {text: "To detect blockages or leaks", correct: true},
+            {text: "To control temperature", correct: false},
+            {text: "To measure pH", correct: false}
         ]
     },
     {
-        question: "What does the water flow rate sensor help detect?",
+        question: "What happens in Node-RED if an EC level goes beyond a set threshold?",
         answers: [
-            {text: "Pests attacking the plants", correct: false},
-            {text: "Blockages or leaks in the irrigation system", correct: true},
-            {text: "Amount of sunlight", correct: false},
-            {text: "Temperature of the room", correct: false},
+            {text: "Node-RED shuts down", correct: false},
+            {text: "The sensor disconnects", correct: false},
+            {text: "An alert can be triggered", correct: true},
+            {text: "The chart stops updating", correct: false}
         ]
     },
     {
-        question: "Which communication methods can ESP32 use to send flow rate data to Node-RED?",
+        question: "Which method can be used to send WhatsApp alerts from Node-RED?",
         answers: [
-            {text: "MQTT, HTTP, or WebSocket", correct: true},
-            {text: "Bluetooth or HDMI", correct: false},
-            {text: "CD-ROM or floppy disk", correct: false},
-            {text: "Wi-Fi only", correct: false},
+            {text: "HTTP request node with a third-party API", correct: true},
+            {text: "Direct messaging from the ESP32", correct: false},
+            {text: "Using email services only", correct: false},
+            {text: "SMS command line tools", correct: false}
         ]
     },
     {
-        question: "What visualization method is recommended for monitoring water flow rate in Node-RED?",
+        question: "Why is MQTT well-suited for IoT applications like hydroponics?",
         answers: [
-            {text: "Use a bar graph", correct: false},
-            {text: "Use a gauge or chart", correct: true},
-            {text: "Use a pie chart only", correct: false},
-            {text: "Use a text-only display", correct: false},
+            {text: "It stores data permanently", correct: false},
+            {text: "It provides high-resolution graphics", correct: false},
+            {text: "It only works with desktop computers", correct: false},
+            {text: "It works efficiently over low bandwidth", correct: true}
         ]
     }
 ];

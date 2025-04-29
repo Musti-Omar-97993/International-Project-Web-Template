@@ -4,12 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hydroponics Learning Puzzles</title>
+
+    <!-- icon -->
+    <link rel="icon" href="images/hydroponicsProjectIcon.png" type="image/x-icon">
+
+    <!-- box icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="header">
-        <div class="logo">ReFlow</div>
+        <a href="#" class="logo">ReFlow.</a>
+
+        <nav class="navbar">
+            <a href="ide_navigation.html" class="active">Playground</a>
+        </nav>
+
+        <div class="bx bx-moon" id="darkMode-icon"></div>
     </header>
 
     <h1 class="page-title">Hydroponics Learning Puzzles</h1>
@@ -252,6 +265,7 @@
             <button class="close-btn">×</button>
         </div>
     </div>
+    <a href="#" class="top">Back to Top &#8593;</a>
 
     <footer class="footer">
         <p>Reflow © 2025 | All Rights Reserved</p>
@@ -263,6 +277,7 @@
     <audio id="victorySound" src="sounds/victory.mp3" preload="auto"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="script.js"></script>
     <script src="puzzle.js"></script>
 </body>
 </html>
