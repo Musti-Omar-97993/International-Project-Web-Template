@@ -1,138 +1,3489 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hydroponic Programming Lab</title>
+    <title>Hydroponics & Aquaponics Programming IDE</title>
 
-    <!-- icon -->
-    <link rel="icon" href="images/hydroponicsProjectIcon.png" type="image/x-icon">
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly@6.20210701.0/blockly.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- box icons -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* ========== BASE STYLES ========== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    <link rel="stylesheet" href="styles.css">
+        header {
+            background-color: #2c8a5a;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* ========== MAIN LAYOUT ========== */
+        .main-content {
+            display: flex;
+            flex: 1;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .ide-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 1rem;
+        }
+
+        .blockly-area {
+            display: flex;
+            flex: 1;
+            gap: 1rem;
+        }
+
+        /* ========== BLOCKLY WORKSPACE ========== */
+        .blockly-container {
+            flex: 3;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        #blocklyDiv {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+
+        /* ========== OUTPUT PANEL ========== */
+        .output-panel {
+            flex: 1;
+            max-width: 300px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #2c8a5a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #116a4a;
+        }
+
+        /* ========== SENSOR DISPLAY ========== */
+        .sensor-display h3 {
+            margin-top: 0;
+            color: #2c8a5a;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .sensor-item {
+            background-color: #f9f9f9;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .sensor-value {
+            font-weight: bold;
+            color: #2c8a5a;
+        }
+
+        /* ========== LOG CONTAINER ========== */
+        .log-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-time {
+            color: #666;
+            margin-right: 0.5rem;
+        }
+
+        /* ========== SYSTEM VISUALIZATION ========== */
+        .system-visualization {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+
+        .status-item {
+            margin: 5px 0;
+        }
+
+        /* ========== PLANT VISUALIZATION ========== */
+        .plant-visualization {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .plant {
+            text-align: center;
+        }
+
+        .plant-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .plant-health {
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+
+        .plant-health-fill {
+            height: 100%;
+            background-color: #2c8a5a;
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        /* ========== SIMULATION ENVIRONMENT ========== */
+        #simulation-environment {
+            width: 100%;
+            background-color: white;
+            border-top: 1px solid #ddd;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .simulation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .simulation-header h2 {
+            margin: 0;
+            color: #2c8a5a;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .simulation-content {
+            display: flex;
+            gap: 1.5rem;
+            height: 300px;
+        }
+
+        #simCanvas {
+            flex: 3;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .simulation-alerts {
+            flex: 1;
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+
+        .sim-alert {
+            margin: 0.5rem 0;
+            padding: 0.3rem;
+            border-left: 3px solid;
+            line-height: 1.3;
+        }
+
+        .sim-alert.critical {
+            border-color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .sim-alert.warning {
+            border-color: #f39c12;
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+
+        .sim-alert.info {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        /* Simulation Control Buttons */
+.simulation-controls button {
+    padding: 8px 12px;
+    background-color: #e9f5ef;
+    border: 1px solid #2c8a5a;
+    color: #2c8a5a;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.simulation-controls button:hover {
+    background-color: #2c8a5a;
+    color: white;
+}
+
+.simulation-controls button.active-control {
+    background-color: #2c8a5a;
+    color: white;
+    box-shadow: 0 0 0 2px rgba(44, 138, 90, 0.5);
+}
+
+#simPause {
+    min-width: 80px; /* Prevent button size changing */
+}
+
+        /* ========== RESPONSIVE ADJUSTMENTS ========== */
+        @media (max-width: 1200px) {
+            .blockly-area {
+                flex-direction: column;
+            }
+            
+            .toolbox {
+                max-width: 100%;
+                order: -1;
+            }
+            
+            .output-panel {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
-<body class="ideBody">
-
-  <!-- Header -->
-  <header class="header">
-    <a href="#" class="logo">ReFlow.</a>
-
-    <nav class="navbar">
-        <a href="ide_navigation.html" class="active">Playground</a>
-    </nav>
-
-    <div class="bx bx-moon" id="darkMode-icon"></div>
-</header>
-    
-    <h1>🌿 Learn how to code with Blockly 🌞</h1>
-
-    <div id="ide-container">
-    <div id="blocklyDiv"></div>
-    <div id="output-panel">
-        
-        <h2>🌻 Garden Control Center</h2>
-
-    <div class="sensor-card">
-        <div class="tooltip">💧 Water Level: <span id="water-level" class="sensor-value">500</span>/1000
-            <span class="tooltiptext">Plants need water between 300-800 for happy growth!</span>
-        </div>
-        <div class="progress-bar"><div id="water-progress" class="progress-fill" style="width: 50%;"></div></div>
-    </div>
-
-    <div class="sensor-card">
-        <div class="tooltip">☀️ Light Level: <span id="light-level" class="sensor-value">700</span>/1000
-            <span class="tooltiptext">Plants need light >500 during day time!</span>
-        </div>
-        <div class="progress-bar"><div id="light-progress" class="progress-fill" style="width: 70%;"></div></div>
-    </div>
-
-    <div class="sensor-card">
-        <div class="tooltip">🧪 pH Level: <span id="ph-level" class="sensor-value">6.5</span>
-            <span class="tooltiptext">Perfect pH is between 5.5-6.5 for most plants!</span>
-        </div>
-        <div class="progress-bar"><div id="ph-progress" class="progress-fill" style="width: 46%;"></div></div>
-    </div>
-
-    <div class="sensor-card">
-        <div class="tooltip">🌡️ Temperature: <span id="temp-level" class="sensor-value">22</span>°C
-            <span class="tooltiptext">Ideal temperature is 18-25°C for happy plants!</span>
-        </div>
-        <div class="progress-bar"><div id="temp-progress" class="progress-fill" style="width: 44%;"></div></div>
-    </div>
-
-    <div class="sensor-card">
-        <div class="tooltip">💨 Humidity: <span id="humidity-level" class="sensor-value">65</span>%
-            <span class="tooltiptext">Plants like humidity between 40-70%!</span>
-        </div>
-        <div class="progress-bar"><div id="humidity-progress" class="progress-fill" style="width: 65%;"></div></div>
-    </div>
-
-    <div class="sensor-card">
-        <div class="tooltip">🧂 Nutrients: <span id="nutrient-level" class="sensor-value">450</span>/1000
-            <span class="tooltiptext">Nutrients should be between 300-700 for best growth!</span>
-        </div>
-        <div class="progress-bar"><div id="nutrient-progress" class="progress-fill" style="width: 45%;"></div></div>
-    </div>
-
-    <div class="device-card">
-        <h3>⚙️ Devices</h3>
-        <p>🚰 Water Pump: <span id="pump-indicator" class="status-indicator status-off"></span><span id="pump-status">OFF</span></p>
-        <p>💡 Grow Light: <span id="light-indicator" class="status-indicator status-off"></span><span id="light-status">OFF</span></p>
-        <p>💨 Fan: <span id="fan-indicator" class="status-indicator status-off"></span><span id="fan-status">OFF</span></p>
-        <p>🧪 Nutrient Mixer: <span id="mixer-indicator" class="status-indicator status-off"></span><span id="mixer-status">OFF</span></p>
-    </div>
-
-    <div class="device-card">
-        <h3>🌱 Plants</h3>
-        <div id="plant-display">
-            <p><span class="plant-type">Lettuce:</span> <span id="lettuce-health">90</span>% healthy</p>
-        <div class="plant-health">
-            <span>Health:</span>
-            <div class="health-bar"><div id="lettuce-health-bar" class="health-fill" style="width: 90%;"></div></div>
-        </div>
-        </div>
-    </div>
-
-    <div class="device-card">
-        <h3>⛅ Environment</h3>
-        <p><span id="weather-icon" class="weather-icon">☀️</span> <span id="weather-status">Sunny</span></p>
-        <p>⏱️ <span id="time-display">Day 1, 12:00 PM</span></p>
-    </div>
-
-    <div id="simulation">
-        <div class="water" id="water" style="height: 50%;"></div>
-        <div class="plant" id="plant1" style="left: 20%; height: 60px;"></div>
-        <div class="plant" id="plant2" style="left: 40%; height: 70px;"></div>
-        <div class="plant" id="plant3" style="left: 60%; height: 50px;"></div>
-        <div class="plant" id="plant4" style="left: 80%; height: 65px;"></div>
-        <div class="sun" id="sun"></div>
-        <div class="cloud" id="cloud1" style="left: 10%;"></div>
-        <div class="cloud" id="cloud2" style="left: 60%; width: 80px;"></div>
-    </div>  
-    <h3>📝 Event Log</h3>
-        <div id="event-log" class="event-log"></div>
-
+<body>
+    <header>
+        <div class="logo">HydroGrow IDE</div>
         <div>
-            <button id="run-btn">▶ Run Program</button>
-            <button id="stop-btn">■ Stop</button>
-            <button id="demo-btn">Load Demo</button>
-            <button id="clear-btn">🧹 Clear Log</button>
-            <button id="harvest-btn">🌱 Harvest</button>
+            <button id="saveBtn">Save Program</button>
+            <button id="loadBtn">Load Program</button>
+            <button id="demoBtn">Load Demo</button>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="ide-container">
+            <div class="blockly-area">
+                <div class="blockly-container">
+                    <div id="blocklyDiv"></div>
+                </div>
+                
+                <div class="output-panel">
+                    <div class="controls">
+                        <button id="runBtn">Run</button>
+                        <button id="stopBtn">Stop</button>
+                        <button id="resetBtn">Reset</button>
+                        <button id="clearLogBtn">Clear Log</button>
+                    </div>
+                    
+                    <div class="sensor-display">
+                        <h3>Sensor Data</h3>
+                        <div class="sensor-grid">
+                            <div class="sensor-item">Water Level: <span class="sensor-value" id="waterLevel">500</span> L</div>
+                            <div class="sensor-item">Light Level: <span class="sensor-value" id="lightLevel">650</span> Lux</div>
+                            <div class="sensor-item">pH Level: <span class="sensor-value" id="pHLevel">6.2</span></div>
+                            <div class="sensor-item">Temperature: <span class="sensor-value" id="temperature">22.5</span>°C</div>
+                            <div class="sensor-item">Humidity: <span class="sensor-value" id="humidity">65</span>%</div>
+                            <div class="sensor-item">Nutrient Level: <span class="sensor-value" id="nutrientLevel">320</span> ppm</div>
+                            <div class="sensor-item">CO2 Level: <span class="sensor-value" id="co2Level">450</span> ppm</div>
+                            <div class="sensor-item">Water Temp: <span class="sensor-value" id="waterTemp">20.0</span>°C</div>
+                        </div>
+                    </div>
+                    
+                    <div class="visualization">
+                        <canvas id="sensorChart"></canvas>
+                    </div>
+                    
+                    <div class="system-visualization">
+                        <h3>System Status</h3>
+                        <div class="status-item">Water Pump: <span id="pumpStatus">OFF</span></div>
+                        <div class="status-item">Grow Light: <span id="lightStatus">ON</span></div>
+                        <div class="status-item">Fan: <span id="fanStatus">LOW</span> (<span id="fanSpeed">30</span>%)</div>
+                        <div class="status-item">Nutrient Mixer: <span id="mixerStatus">OFF</span></div>
+                        <div class="status-item">Current Weather: <span id="weatherStatus">Sunny</span></div>
+                        <div class="status-item">Time of Day: <span id="timeStatus">Day</span></div>
+                    </div>
+                    
+                    <div class="plant-visualization">
+                        <div class="plant">
+                            <div class="plant-icon">🌱</div>
+                            <div>Lettuce</div>
+                            <div>Height: <span id="lettuceHeight">120</span> mm</div>
+                            <div class="plant-health">
+                                <div class="plant-health-fill" id="lettuceHealth"></div>
+                            </div>
+                        </div>
+                        <div class="plant">
+                            <div class="plant-icon">🌿</div>
+                            <div>Basil</div>
+                            <div>Height: <span id="basilHeight">85</span> mm</div>
+                            <div class="plant-health">
+                                <div class="plant-health-fill" id="basilHealth"></div>
+                            </div>
+                        </div>
+                        <div class="plant">
+                            <div class="plant-icon">🍓</div>
+                            <div>Strawberry</div>
+                            <div>Height: <span id="strawberryHeight">65</span> mm</div>
+                            <div class="plant-health">
+                                <div class="plant-health-fill" id="strawberryHealth"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="log-container" id="logContainer">
+                        <div class="log-entry"><span class="log-time">[10:00:00]</span> System initialized</div>
+                        <div class="log-entry"><span class="log-time">[10:00:05]</span> Grow lights turned ON</div>
+                        <div class="log-entry"><span class="log-time">[10:01:30]</span> Water pump activated for 5 seconds</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; <span id="year"></span> Reflow. All rights reserved.</p>
-  </footer>
+    <!-- STANDALONE SIMULATION ENVIRONMENT -->
+    <div id="simulation-environment">
+        <div class="simulation-header">
+            <h2>System Visualization</h2>
+            <div class="simulation-controls">
+                <button id="simSpeedUp">Speed Up (2x)</button>
+                <button id="simSlowDown">Slow Down (0.5x)</button>
+                <button id="simPause">Pause</button>
+                <button id="simReset">Reset View</button>
+            </div>
+        </div>
+        <div class="simulation-content">
+            <canvas id="simCanvas"></canvas>
+            <div class="simulation-alerts" id="simAlerts">
+                <!-- Alerts will appear here -->
+            </div>
+        </div>
+    </div>
     
-    <!-- Blockly and dependencies -->
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
-    <script src="https://unpkg.com/blockly/msg/en.js"></script>
-    <script src="ide.js"></script>
+    <script>
+
+        // ======================
+        // BLOCK DEFINITIONS
+        // ======================
+
+        // 🌱 Sensor Blocks
+        Blockly.Blocks["read_sensor"] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("read")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["water level", "WATER_LEVEL"],
+                        ["light level", "LIGHT_LEVEL"],
+                        ["pH level", "PH_LEVEL"],
+                        ["temperature", "TEMPERATURE"],
+                        ["humidity", "HUMIDITY"],
+                        ["nutrient level", "NUTRIENT_LEVEL"],
+                        ["CO2 level", "CO2_LEVEL"],
+                        ["plant height", "PLANT_HEIGHT"],
+                        ["water temperature", "WATER_TEMP"],
+                        ["air flow", "AIR_FLOW"]
+                    ]), "SENSOR");
+                this.setOutput(true, "Number");
+                this.setColour(120);
+                this.setTooltip("Read a sensor value from the hydroponic system");
+                this.setHelpUrl("");
+            }
+        };
+
+        Blockly.Blocks['read_plant_height'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("read plant height of")
+                    .appendField(new Blockly.FieldDropdown([
+                        ['lettuce', 'LETTUCE'],
+                        ['basil', 'BASIL'],
+                        ['strawberry', 'STRAWBERRY']
+                    ]), "PLANT_TYPE");
+                this.setOutput(true, "Number");
+                this.setColour(120);
+                this.setTooltip("Read the current height of a specific plant");
+            }
+        };
+
+        // ⚙️ Control Flow Blocks
+        // If block
+Blockly.Blocks["hydroponic_if"] = {
+    init: function() {
+        this.appendValueInput('CONDITION')
+            .setCheck('Boolean')
+            .appendField('if');
+        this.appendStatementInput('DO')
+            .appendField('do');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Execute blocks if condition is true');
+    }
+};
+
+// If-else block
+Blockly.Blocks['hydroponic_if_else'] = {
+    init: function() {
+        this.appendValueInput('CONDITION')
+            .setCheck('Boolean')
+            .appendField('if');
+        this.appendStatementInput('DO')
+            .appendField('do');
+        this.appendStatementInput('ELSE')
+            .appendField('else do');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Execute first blocks if true, else execute other blocks');
+    }
+};
+
+// Switch block with mutator
+Blockly.Blocks['hydroponic_switch'] = {
+    init: function() {
+        this.appendValueInput('VALUE')
+            .appendField('switch');
+        this.appendDummyInput()
+            .appendField('case')
+            .appendField(new Blockly.FieldTextInput('value'), 'CASE1');
+        this.appendStatementInput('DO1')
+            .appendField('do');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Execute different blocks based on a value');
+        this.setMutator(new Blockly.Mutator(['hydroponic_switch_case']));
+        this.caseCount_ = 1;
+    },
+    mutationToDom: function() {
+        const container = document.createElement('mutation');
+        container.setAttribute('cases', this.caseCount_);
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.caseCount_ = parseInt(xmlElement.getAttribute('cases'), 10);
+        // Clear existing inputs (except VALUE)
+        for (let i = 1; i <= this.caseCount_; i++) {
+            if (this.getInput('CASE' + i)) {
+                this.removeInput('CASE' + i);
+                this.removeInput('DO' + i);
+            }
+        }
+        // Rebuild inputs
+        for (let i = 1; i <= this.caseCount_; i++) {
+            this.appendDummyInput('CASE' + i)
+                .appendField('case')
+                .appendField(new Blockly.FieldTextInput('value'), 'CASE' + i);
+            this.appendStatementInput('DO' + i)
+                .appendField('do');
+        }
+    }
+};
+
+// Mutator block for switch
+Blockly.Blocks['hydroponic_switch_case'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Add case");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip("Add a new case to the switch block");
+    }
+};
+
+// Repeat block
+Blockly.Blocks['hydroponic_repeat'] = {
+    init: function() {
+        this.appendValueInput("TIMES")
+            .setCheck("Number")
+            .appendField("repeat");
+        this.appendDummyInput()
+            .appendField("times do");
+        this.appendStatementInput("DO");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip("Repeat blocks a specified number of times");
+        this.setInputsInline(true);
+    },
+    onchange: function() {
+        const times = Blockly.JavaScript.valueToCode(this, 'TIMES',
+            Blockly.JavaScript.ORDER_ATOMIC);
+        if (times && parseFloat(times) < 1) {
+            this.setWarningText("Repeat count must be at least 1");
+        } else {
+            this.setWarningText(null);
+        }
+    }
+};
+
+// While block
+Blockly.Blocks['hydroponic_while'] = {
+    init: function() {
+        this.appendValueInput("CONDITION")
+            .setCheck('Boolean')
+            .appendField('while');
+        this.appendDummyInput()
+            .appendField('do');
+        this.appendStatementInput('DO');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Repeat blocks while condition is true');
+    }
+};
+
+// Every block (timed loop)
+Blockly.Blocks['hydroponic_every'] = {
+    init: function() {
+        this.appendValueInput('SECONDS')
+            .setCheck('Number')
+            .appendField('every');
+        this.appendDummyInput()
+            .appendField('seconds do');
+        this.appendStatementInput('DO');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Execute blocks at regular intervals');
+        this.setInputsInline(true);
+    },
+    onchange: function() {
+        const seconds = Blockly.JavaScript.valueToCode(this, 'SECONDS',
+            Blockly.JavaScript.ORDER_ATOMIC);
+        if (seconds && parseFloat(seconds) < 0.1) {
+            this.setWarningText("Minimum interval is 0.1 seconds");
+        } else {
+            this.setWarningText(null);
+        }
+    }
+};
+
+// Wait block
+Blockly.Blocks['hydroponic_wait'] = {
+    init: function() {
+        this.appendValueInput('SECONDS')
+            .setCheck('Number')
+            .appendField('wait');
+        this.appendDummyInput()
+            .appendField('seconds');
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(210);
+        this.setTooltip('Pause program execution');
+        this.setInputsInline(true);
+    },
+    onchange: function() {
+        const seconds = Blockly.JavaScript.valueToCode(this, 'SECONDS',
+            Blockly.JavaScript.ORDER_ATOMIC);
+        if (seconds && parseFloat(seconds) < 0.1) {
+            this.setWarningText("Minimum delay is 0.1 seconds");
+        } else {
+            this.setWarningText(null);
+        }
+    }
+};
+
+        // 🎛️ Action Blocks
+        Blockly.Blocks['water_pump_control'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("turn water pump")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["ON","ON"],
+                        ["OFF","OFF"],
+                        ["for 5 sec","TIMED_5"],
+                        ["for 10 sec","TIMED_10"]
+                    ]), "STATE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Control the water pump");
+            }
+        };
+
+        Blockly.Blocks['grow_light_control'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("turn grow light")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["ON", "ON"],
+                        ["OFF", "OFF"],
+                        ["morning mode", "MORNING"],
+                        ["evening mode", "EVENING"]
+                    ]), "STATE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Control the grow lights");
+            }
+        };
+
+        Blockly.Blocks['fan_control'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("turn fan")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["ON", "ON"],
+                        ["OFF", "OFF"],
+                        ["low speed", "LOW"],
+                        ["high speed", "HIGH"]
+                    ]), "STATE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Control the ventilation fan");
+            }
+        };
+
+        Blockly.Blocks['ventilation_control'] = {
+            init: function() {
+                this.appendValueInput("PERCENT")
+                    .setCheck("Number")
+                    .appendField("set ventilation to");
+                this.appendDummyInput()
+                    .appendField("%");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Set fan speed percentage (0-100)");
+            }
+        };
+
+        Blockly.Blocks['nutrient_mixer_control'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("turn nutrient mixer")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["ON", "ON"],
+                        ["OFF", "OFF"],
+                        ["for 5 sec", "TIMED_5"],
+                        ["for 10 sec", "TIMED_10"]
+                    ]), "STATE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Control the nutrient mixer");
+            }
+        };
+
+        Blockly.Blocks['ph_adjustment'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("adjust pH")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["up", "UP"],
+                        ["down", "DOWN"]
+                    ]), "DIRECTION");
+                this.appendValueInput("AMOUNT")
+                    .setCheck("Number")
+                    .appendField("by");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Adjust the pH level of the nutrient solution");
+            }
+        };
+
+        Blockly.Blocks['temperature_control'] = {
+            init: function() {
+                this.appendValueInput("TEMPERATURE")
+                    .setCheck("Number")
+                    .appendField("set temperature to");
+                this.appendDummyInput()
+                    .appendField("°C");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Set target air temperature");
+            }
+        };
+
+        Blockly.Blocks['add_fertilizer'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("add fertilizer")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["Type A", "A"],
+                        ["Type B", "B"],
+                        ["Type C", "C"]
+                    ]), "TYPE");
+                this.appendValueInput("AMOUNT")
+                    .setCheck("Number")
+                    .appendField("ml");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Add specific fertilizer to the system");
+            }
+        };
+
+        Blockly.Blocks["add_nutrients"] = {
+            init: function() {
+                this.appendValueInput("AMOUNT")
+                    .setCheck("Number")
+                    .appendField("add nutrients")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["small", "50"],
+                        ["medium", "100"],
+                        ["large", "200"]
+                    ]), "PRESET");
+                this.appendDummyInput()
+                    .appendField("ml");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Add nutrients to the system");
+            }
+        };
+
+        Blockly.Blocks["log_data"] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("log data")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["all sensors", "ALL"],
+                        ["water sensors", "WATER"],
+                        ["nutrient sensors", "NUTRIENT"],
+                        ["environment sensors", "ENV"]
+                    ]), "TYPE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Log sensor data to the output");
+            }
+        };
+
+        Blockly.Blocks['say_message'] = {
+            init: function() {
+                this.appendValueInput("MESSAGE")
+                    .setCheck("String")
+                    .appendField("say");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Display a custom message in the log");
+            }
+        };
+
+        Blockly.Blocks['daily_schedule'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("every day at")
+                    .appendField(new Blockly.FieldTextInput("08:00"), "TIME");
+                this.appendStatementInput("DO")
+                    .appendField("do");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Schedule daily actions at a specific time");
+            }
+        };
+
+        Blockly.Blocks["weather_trigger"] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("when weather is")
+                    .appendField(new Blockly.FieldDropdown([
+                        ["sunny", "SUNNY"],
+                        ["cloudy", "CLOUDY"],
+                        ["rainy", "RAINY"],
+                        ["windy", "WINDY"]
+                    ]), "WEATHER");
+                this.appendStatementInput("DO")
+                    .appendField("do");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(160);
+                this.setTooltip("Trigger actions based on weather conditions");
+            }
+        };
+
+        // 🔢 Math Blocks
+        Blockly.Blocks['math_advanced'] = {
+            init: function() {
+                this.appendValueInput('A')
+                    .setCheck('Number');
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ['+','ADD'],
+                        ['-','MINUS'],
+                        ['×','MULTIPLY'],
+                        ['÷','DIVIDE'],
+                        ['^','POWER'],
+                        ['remainder of', 'MODULO']
+                    ]), 'OP');
+                this.appendValueInput('B')
+                    .setCheck('Number');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Advanced math operations');
+            }
+        };
+
+        Blockly.Blocks['math_round'] = {
+            init: function() {
+                this.appendValueInput('NUM')
+                    .setCheck('Number')
+                    .appendField('round');
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Round a number to nearest integer');
+            }
+        };
+
+        Blockly.Blocks['math_constrain'] = {
+            init: function() {
+                this.appendValueInput('VALUE')
+                    .setCheck('Number')
+                    .appendField('constrain');
+                this.appendValueInput('MIN')
+                    .setCheck('Number')
+                    .appendField('between');
+                this.appendValueInput('MAX')
+                    .setCheck('Number')
+                    .appendField('and');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Constrain a value between min and max');
+            }
+        };
+
+        Blockly.Blocks['math_random_int'] = {
+            init: function() {
+                this.appendValueInput('FROM')
+                    .setCheck('Number')
+                    .appendField('random integer from');
+                this.appendValueInput('TO')
+                    .setCheck('Number')
+                    .appendField('to');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Random integer between two values');
+            }
+        };
+
+        Blockly.Blocks['math_random_float'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('random decimal');
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Random decimal between 0 and 1');
+            }
+        };
+
+        Blockly.Blocks['math_advanced_single'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ['√', 'SQRT'],
+                        ['abs', 'ABS'],
+                        ['-', 'NEGATE'],
+                        ['ln', 'LN'],
+                        ['log10', 'LOG10'],
+                        ['e^', 'EXP'],
+                        ['10^', 'POW10'],
+                        ['sin', 'SIN'],
+                        ['cos', 'COS'],
+                        ['tan', 'TAN']
+                    ]), 'OP');
+                this.appendValueInput('NUM')
+                    .setCheck('Number');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Advanced single-argument math functions');
+            }
+        };
+
+        Blockly.Blocks['math_constant'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ["π","PI"],
+                        ["e","E"],
+                        ["φ (golden ratio)","GOLDEN_RATIO"],
+                        ["√2","SQRT2"],
+                        ["√½","SQRT1_2"],
+                        ["∞","INFINITY"]
+                    ]), 'CONSTANT');
+                this.setOutput(true, 'Number');
+                this.setColour(230);
+                this.setTooltip('Mathematical constants');
+            }
+        };
+
+        // 📜 Text Blocks
+        Blockly.Blocks['text_join'] = {
+            init: function() {
+                this.appendValueInput('A')
+                    .setCheck('String')
+                    .appendField('Join');
+                this.appendValueInput('B')
+                    .setCheck('String');
+                this.setInputsInline(true);
+                this.setOutput(true, 'String');
+                this.setColour(160);
+                this.setTooltip('Join two text strings together');
+            }
+        };
+
+        Blockly.Blocks['text_length'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('length of');
+                this.setOutput(true, 'Number');
+                this.setColour(160);
+                this.setTooltip('Get length of a text string');
+            }
+        };
+
+        Blockly.Blocks['text_isEmpty'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('is');
+                this.appendDummyInput()
+                    .appendField('empty?');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Boolean');
+                this.setColour(160);
+                this.setTooltip('Check if text is empty');
+            }
+        };
+
+        Blockly.Blocks['text_charAt'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('get character at');
+                this.appendValueInput('POS')
+                    .setCheck('Number')
+                    .appendField('from');
+                this.setInputsInline(true);
+                this.setOutput(true, 'String');
+                this.setColour(160);
+                this.setTooltip('Get character at position (starting from 0)');
+            }
+        };
+
+        Blockly.Blocks['text_substring'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('get substring from');
+                this.appendValueInput('FROM')
+                    .setCheck('Number');
+                this.appendValueInput('TO')
+                    .setCheck('Number')
+                    .appendField('to');
+                this.setInputsInline(true);
+                this.setOutput(true, 'String');
+                this.setColour(160);
+                this.setTooltip('Extract part of a text string');
+            }
+        };
+
+        Blockly.Blocks['text_changeCase'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('change');
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ['to UPPERCASE', 'UPPERCASE'],
+                        ['to lowercase', 'LOWERCASE'],
+                        ['to Title Case', 'TITLECASE']
+                    ]), 'CASE');
+                this.setInputsInline(true);
+                this.setOutput(true, 'String');
+                this.setColour(160);
+                this.setTooltip('Change text case');
+            }
+        };
+
+        Blockly.Blocks['text_trim'] = {
+            init: function() {
+                this.appendValueInput('TEXT')
+                    .setCheck('String')
+                    .appendField('trim');
+                this.setOutput(true, 'String');
+                this.setColour(160);
+                this.setTooltip('Remove whitespace from both ends');
+            }
+        };
+
+        // 🔘 Logic Blocks
+        Blockly.Blocks["logic_compare"] = {
+            init: function() {
+                this.appendValueInput('A');
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ['=','EQ'],
+                        ['≠','NEQ'],
+                        ['<','LT'],
+                        ['≤','LTE'],
+                        ['>','GT'],
+                        ['≥','GTE']
+                    ]), 'OP');
+                this.appendValueInput('B');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Boolean');
+                this.setColour(210);
+                this.setTooltip('Compare two values');
+            }
+        };
+
+        Blockly.Blocks["logic_operation"] = {
+            init: function() {
+                this.appendValueInput('A')
+                    .setCheck('Boolean');
+                this.appendDummyInput()
+                    .appendField(new Blockly.FieldDropdown([
+                        ['AND','AND'],
+                        ['OR','OR']
+                    ]), 'OP');
+                this.appendValueInput('B')
+                    .setCheck('Boolean');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Boolean');
+                this.setColour(210);
+                this.setTooltip('Logical AND/OR operations');
+            }
+        };
+
+        Blockly.Blocks["logic_negate"] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('NOT');
+                this.appendValueInput('BOOL')
+                    .setCheck('Boolean');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Boolean');
+                this.setColour(210);
+                this.setTooltip('Logical NOT operation');
+            }
+        };
+
+        Blockly.Blocks["logic_ternary"] = {
+            init: function() {
+                this.appendValueInput('CONDITION')
+                    .setCheck('Boolean')
+                    .appendField('if');
+                this.appendValueInput('THEN')
+                    .appendField('then');
+                this.appendValueInput('ELSE')
+                    .appendField('else');
+                this.setInputsInline(true);
+                this.setOutput(true, null);
+                this.setColour(210);
+                this.setTooltip('Ternary operator (if-then-else)');
+            }
+        };
+
+        // 📦 Variable Blocks
+        Blockly.Blocks['variables_set'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('set')
+                    .appendField(new Blockly.FieldVariable('item'), 'VAR')
+                    .appendField('to');
+                this.appendValueInput('VALUE');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(290);
+                this.setTooltip('Set a variable to a value');
+            }
+        };
+
+        Blockly.Blocks['variables_change'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('change')
+                    .appendField(new Blockly.FieldVariable('item'), 'VAR')
+                    .appendField('by');
+                this.appendValueInput('VALUE')
+                    .setCheck('Number');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(290);
+                this.setTooltip('Change a variable by a value');
+            }
+        };
+
+        Blockly.Blocks['variables_get'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('get')
+                    .appendField(new Blockly.FieldVariable('item'), 'VAR');
+                this.setOutput(true, null);
+                this.setColour(290);
+                this.setTooltip('Get the value of a variable');
+            }
+        };
+
+        // ======================
+        // JAVASCRIPT GENERATORS
+        // ======================
+
+        // 🌱 Sensor Blocks
+        Blockly.JavaScript['read_sensor'] = function(block) {
+            const sensorType = block.getFieldValue('SENSOR');
+            return [`getSensorValue('${sensorType}')`, Blockly.JavaScript.ORDER_ATOMIC];
+        };
+
+        Blockly.JavaScript['read_plant_height'] = function(block) {
+            const plantType = block.getFieldValue('PLANT_TYPE');
+            return [`getPlantHeight('${plantType}')`, Blockly.JavaScript.ORDER_ATOMIC];
+        };
+
+        // ⚙️ Control Flow Blocks
+        Blockly.JavaScript['hydroponic_if'] = function(block) {
+            const condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `if (${condition}) {\n${doCode}}\n`;
+        };
+
+        Blockly.JavaScript['hydroponic_if_else'] = function(block) {
+            const condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            const elseCode = Blockly.JavaScript.statementToCode(block, 'ELSE') || '';
+            return `if (${condition}) {\n${doCode}} else {\n${elseCode}}\n`;
+        };
+
+        Blockly.JavaScript['hydroponic_switch'] = function(block) {
+            const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || 'null';
+            let code = `switch (${value}) {\n`;
+            for (let i = 1; i <= block.caseCount_; i++) {
+                const caseValue = block.getFieldValue('CASE' + i);
+                const caseCode = Blockly.JavaScript.statementToCode(block, 'DO' + i) || '';
+                code += `case "${caseValue}":\n${caseCode} break;\n`;
+            }
+            code += '}\n';
+            return code;
+        };
+
+        Blockly.JavaScript['hydroponic_repeat'] = function(block) {
+            const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `for (let i = 0; i < ${times}; i++) {\n${doCode}}\n`;
+        };
+
+        Blockly.JavaScript['hydroponic_while'] = function(block) {
+            const condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `while (${condition}) {\n${doCode}}\n`;
+        };
+
+        Blockly.JavaScript['hydroponic_every'] = function(block) {
+            const seconds = Blockly.JavaScript.valueToCode(block, 'SECONDS', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `setInterval(function() {\n${doCode}}, ${seconds} * 1000);\n`;
+        };
+
+        Blockly.JavaScript['hydroponic_wait'] = function(block) {
+            const seconds = Blockly.JavaScript.valueToCode(block, 'SECONDS', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+            return `await new Promise(resolve => setTimeout(resolve, ${seconds} * 1000));\n`;
+        };
+
+        // 🎛️ Action Blocks
+        Blockly.JavaScript["water_pump_control"] = function(block) {
+            const state = block.getFieldValue('STATE');
+            let duration = 0;
+            if (state === 'TIMED_5') duration = 5;
+            if (state === 'TIMED_10') duration = 10;
+            return `controlWaterPump('${state}', ${duration});\n`;
+        };
+
+        Blockly.JavaScript['grow_light_control'] = function(block) {
+            const state = block.getFieldValue('STATE');
+            return `controlGrowLight('${state}');\n`;
+        };
+
+        Blockly.JavaScript['fan_control'] = function(block) {
+            const state = block.getFieldValue('STATE');
+            return `controlFan('${state}');\n`;
+        };
+
+        Blockly.JavaScript['ventilation_control'] = function(block) {
+            const percent = Blockly.JavaScript.valueToCode(block, 'PERCENT', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return `setVentilation(${percent});\n`;
+        };
+
+        Blockly.JavaScript['nutrient_mixer_control'] = function(block) {
+            const state = block.getFieldValue('STATE');
+            let duration = 0;
+            if (state === 'TIMED_5') duration = 5;
+            if (state === 'TIMED_10') duration = 10;
+            return `controlNutrientMixer('${state}', ${duration});\n`;
+        };
+
+        Blockly.JavaScript['ph_adjustment'] = function(block) {
+            const direction = block.getFieldValue('DIRECTION');
+            const amount = Blockly.JavaScript.valueToCode(block, 'AMOUNT', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return `adjustPH('${direction}', ${amount});\n`;
+        };
+
+        Blockly.JavaScript['temperature_control'] = function(block) {
+            const temp = Blockly.JavaScript.valueToCode(block, 'TEMPERATURE', Blockly.JavaScript.ORDER_ATOMIC) || '22';
+            return `setTemperature(${temp});\n`;
+        };
+
+        Blockly.JavaScript['add_fertilizer'] = function(block) {
+            const type = block.getFieldValue('TYPE');
+            const amount = Blockly.JavaScript.valueToCode(block, 'AMOUNT', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return `addFertilizer('${type}', ${amount});\n`;
+        };
+
+        Blockly.JavaScript['add_nutrients'] = function(block) {
+            const preset = block.getFieldValue('PRESET');
+            const amount = Blockly.JavaScript.valueToCode(block, 'AMOUNT', Blockly.JavaScript.ORDER_ATOMIC) || preset;
+            return `addNutrients(${amount});\n`;
+        };
+
+        Blockly.JavaScript['log_data'] = function(block) {
+            const type = block.getFieldValue('TYPE');
+            return `logData('${type}');\n`;
+        };
+
+        Blockly.JavaScript['say_message'] = function(block) {
+            const message = Blockly.JavaScript.valueToCode(block, 'MESSAGE', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            return `say(${message});\n`;
+        };
+
+        Blockly.JavaScript['daily_schedule'] = function(block) {
+            const time = block.getFieldValue('TIME');
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `scheduleDaily('${time}', function() {\n${doCode}});\n`;
+        };
+
+        Blockly.JavaScript['weather_trigger'] = function(block) {
+            const weather = block.getFieldValue('WEATHER');
+            const doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+            return `onWeather('${weather}', function() {\n${doCode}});\n`;
+        };
+
+        // 🔢 Math Blocks
+        Blockly.JavaScript["math_advanced"] = function(block) {
+            const a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const op = block.getFieldValue('OP');
+            const b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+
+            const operators = {
+                'ADD': ['+', Blockly.JavaScript.ORDER_ADDITION],
+                'MINUS': ['-', Blockly.JavaScript.ORDER_SUBTRACTION],
+                'MULTIPLY': ['*', Blockly.JavaScript.ORDER_MULTIPLICATION],
+                'DIVIDE': ['/', Blockly.JavaScript.ORDER_DIVISION],
+                'POWER': ['**', Blockly.JavaScript.ORDER_EXPONENTIATION],
+                'MODULO': ['%', Blockly.JavaScript.ORDER_MODULUS]
+            };
+            const [symbol, order] = operators[op];
+            return [`${a}${symbol}${b}`, order];
+        };
+
+        Blockly.JavaScript['math_round'] = function(block) {
+            const num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return [`Math.round(${num})`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['math_constrain'] = function(block) {
+            const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const min = Blockly.JavaScript.valueToCode(block, 'MIN', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const max = Blockly.JavaScript.valueToCode(block, 'MAX', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return [`Math.min(${max}, Math.max(${min}, ${value}))`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['math_random_int'] = function(block) {
+            const from = Blockly.JavaScript.valueToCode(block, 'FROM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const to = Blockly.JavaScript.valueToCode(block, 'TO', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+            return [`Math.floor(Math.random() * (${to} - ${from} + 1) + ${from})`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['math_random_float'] = function(block) {
+            return ['Math.random()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['math_advanced_single'] = function(block) {
+            const op = block.getFieldValue('OP');
+            const num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+
+            const functions = {
+                'SQRT': 'Math.sqrt',
+                'ABS': 'Math.abs',
+                'NEGATE': '-',
+                'LN': 'Math.log',
+                'LOG10': 'Math.log10',
+                'EXP': 'Math.exp',
+                'POW10': 'function(num) { return Math.pow(10, num); }',
+                'SIN': 'Math.sin',
+                'COS': 'Math.cos',
+                'TAN': 'Math.tan'
+            };
+
+            const func = functions[op];
+
+            if (op === 'NEGATE') {
+                return [`-${num}`, Blockly.JavaScript.ORDER_UNARY_NEGATION];
+            } else {
+                return [`${func}(${num})`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+            }
+        };
+
+        Blockly.JavaScript['math_constant'] = function(block) {
+            const constant = block.getFieldValue('CONSTANT');
+            const constants = {
+                'PI': 'Math.PI',
+                'E': 'Math.E',
+                'GOLDEN_RATIO': '(1 + Math.sqrt(5)) / 2',
+                'SQRT2': 'Math.SQRT2',
+                'SQRT1_2': 'Math.SQRT1_2',
+                'INFINITY': 'Infinity'
+            };
+            return [constants[constant], Blockly.JavaScript.ORDER_ATOMIC];
+        };
+
+        // 📜 Text Blocks
+        Blockly.JavaScript['text_join'] = function(block) {
+            const a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '""';
+            const b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '""';
+            return [`String(${a}) + String(${b})`, Blockly.JavaScript.ORDER_ADDITION];
+        };
+
+        Blockly.JavaScript['text_length'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            return [`String(${text}).length`, Blockly.JavaScript.ORDER_MEMBER];
+        };
+
+        Blockly.JavaScript['text_isEmpty'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            return [`String(${text}).trim().length === 0`, Blockly.JavaScript.ORDER_EQUALITY];
+        };
+
+        Blockly.JavaScript['text_charAt'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            const pos = Blockly.JavaScript.valueToCode(block, 'POS', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return [`String(${text}).charAt(${pos})`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['text_substring'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            const from = Blockly.JavaScript.valueToCode(block, 'FROM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const to = Blockly.JavaScript.valueToCode(block, 'TO', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return [`String(${text}).substring(${from}, ${to})`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['text_changeCase'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            const caseType = block.getFieldValue('CASE');
+            const cases = {
+                'UPPERCASE': `.toUpperCase()`,
+                'LOWERCASE': `.toLowerCase()`,
+                'TITLECASE': `.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); })`
+            };
+            return [`String(${text})${cases[caseType]}`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        Blockly.JavaScript['text_trim'] = function(block) {
+            const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+            return [`String(${text}).trim()`, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        };
+
+        // 🔘 Logic Blocks
+        Blockly.JavaScript["logic_compare"] = function(block) {
+            const a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            const op = block.getFieldValue('OP');
+            const b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+
+            const operators = {
+                'EQ': '==',
+                'NEQ': '!=',
+                'LT': '<',
+                'GT': '>',
+                'LTE': '<=',
+                'GTE': '>='
+            };
+            return [`${a}${operators[op]}${b}`, Blockly.JavaScript.ORDER_RELATIONAL];
+        };
+
+        Blockly.JavaScript["logic_operation"] = function(block) {
+            const a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || 'false';
+            const op = block.getFieldValue('OP');
+            const b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || 'false';
+
+            const operators = {
+                'AND': '&&',
+                'OR': '||'
+            };
+            return [`${a} ${operators[op]} ${b}`, Blockly.JavaScript.ORDER_LOGICAL_AND];
+        };
+
+        Blockly.JavaScript['logic_negate'] = function(block) {
+            const bool = Blockly.JavaScript.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_ATOMIC) || 'false';
+            return [`!(${bool})`, Blockly.JavaScript.ORDER_LOGICAL_NOT];
+        };
+
+        Blockly.JavaScript['logic_ternary'] = function(block) {
+            const condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_ATOMIC) || 'false';
+            const thenValue = Blockly.JavaScript.valueToCode(block, 'THEN', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+            const elseValue = Blockly.JavaScript.valueToCode(block, 'ELSE', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+            return [`${condition} ? ${thenValue} : ${elseValue}`, Blockly.JavaScript.ORDER_CONDITIONAL];
+        };
+
+        // 📦 Variable Blocks
+        Blockly.JavaScript['variables_set'] = function(block) {
+            const varName = Blockly.JavaScript.variableDB_.getName(
+                block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+            const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ASSIGNMENT) || 'null';
+            return `${varName} = ${value};\n`;
+        };
+
+        Blockly.JavaScript['variables_change'] = function(block) {
+            const varName = Blockly.JavaScript.variableDB_.getName(
+                block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+            const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+            return `${varName} += ${value};\n`;
+        };
+
+        Blockly.JavaScript['variables_get'] = function(block) {
+            const varName = Blockly.JavaScript.variableDB_.getName(
+                block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+            return [varName, Blockly.JavaScript.ORDER_ATOMIC];
+        };
+
+        // ======================
+        // WORKSPACE INITIALIZATION
+        // ======================
+
+    const workspace = Blockly.inject('blocklyDiv', {
+    toolbox: {
+        "kind": "categoryToolbox",
+        "contents": [
+            {
+                "kind": "category",
+                "name": "🌱 Sensors",
+                "colour": "#5ba55b",
+                "contents": [
+                    {"kind": "block", "type": "read_sensor"},
+                    {"kind": "block", "type": "read_plant_height"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "⚙️ Control",
+                "colour": "#5b80a5",
+                "contents": [
+                    {"kind": "block", "type": "hydroponic_if"},
+                    {"kind": "block", "type": "hydroponic_if_else"},
+                    {"kind": "block", "type": "hydroponic_switch"},
+                    {"kind": "block", "type": "hydroponic_repeat"},
+                    {"kind": "block", "type": "hydroponic_while"},
+                    {"kind": "block", "type": "hydroponic_every"},
+                    {"kind": "block", "type": "hydroponic_wait"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "🎛️ Actions",
+                "colour": "#a55b80",
+                "contents": [
+                    {"kind": "block", "type": "water_pump_control"},
+                    {"kind": "block", "type": "grow_light_control"},
+                    {"kind": "block", "type": "fan_control"},
+                    {"kind": "block", "type": "ventilation_control"},
+                    {"kind": "block", "type": "nutrient_mixer_control"},
+                    {"kind": "block", "type": "ph_adjustment"},
+                    {"kind": "block", "type": "temperature_control"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "🔢 Math",
+                "colour": "#5b67a5",
+                "contents": [
+                    {"kind": "block", "type": "math_number"},
+                    {"kind": "block", "type": "math_arithmetic"},
+                    {"kind": "block", "type": "math_advanced"},
+                    {"kind": "block", "type": "math_round"},
+                    {"kind": "block", "type": "math_constrain"},
+                    {"kind": "block", "type": "math_random_int"},
+                    {"kind": "block", "type": "math_random_float"},
+                    {"kind": "block", "type": "math_constant"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "📜 Text",
+                "colour": "#a5815b",
+                "contents": [
+                    {"kind": "block", "type": "text"},
+                    {"kind": "block", "type": "text_join"},
+                    {"kind": "block", "type": "text_length"},
+                    {"kind": "block", "type": "text_isEmpty"},
+                    {"kind": "block", "type": "text_charAt"},
+                    {"kind": "block", "type": "text_substring"},
+                    {"kind": "block", "type": "text_changeCase"},
+                    {"kind": "block", "type": "text_trim"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "🔘 Logic",
+                "colour": "#5ba58c",
+                "contents": [
+                    {"kind": "block", "type": "logic_boolean"},
+                    {"kind": "block", "type": "logic_compare"},
+                    {"kind": "block", "type": "logic_operation"},
+                    {"kind": "block", "type": "logic_negate"},
+                    {"kind": "block", "type": "logic_ternary"}
+                ]
+            },
+            {
+                "kind": "category",
+                "name": "📦 Variables",
+                "colour": "#a55ba5",
+                "contents": [
+                    {"kind": "block", "type": "variables_set"},
+                    {"kind": "block", "type": "variables_change"},
+                    {"kind": "block", "type": "variables_get"}
+                ]
+            }
+        ]
+    },
+    grid: {
+        spacing: 20,
+        length: 3,
+        colour: '#ccc',
+        snap: true
+    },
+    zoom: {
+        controls: true,
+        wheel: true,
+        startScale: 1.0,
+        maxScale: 3,
+        minScale: 0.3,
+        scaleSpeed: 1.2
+    },
+    trashcan: true
+});
+</script>
+
+<script>
+
+// ======================
+// SYSTEM STATE MANAGEMENT
+// ======================
+
+const systemState = {
+            waterPump: 'OFF',
+            growLight: 'ON',
+            fan: 'LOW',
+            fanSpeed: 30,
+            nutrientMixer: 'OFF',
+            pH: 6.2,
+            temperature: 22.5,
+            nutrients: 320,
+            weather: 'Sunny',
+            timeOfDay: 'Day',
+            scheduledTasks: {},
+            weatherCallbacks: {},
+            variables: {},
+            sensorValues: {
+                WATER_LEVEL: 500,
+                LIGHT_LEVEL: 650,
+                PH_LEVEL: 6.2,
+                TEMPERATURE: 22.5,
+                HUMIDITY: 65,
+                NUTRIENT_LEVEL: 320,
+                CO2_LEVEL: 450,
+                WATER_TEMP: 20.0,
+                AIR_FLOW: 30
+            },
+            plantHeights: {
+                LETTUCE: 120,
+                BASIL: 85,
+                STRAWBERRY: 65
+            }
+        };
+
+        // Update UI with current state
+        function updateStatusDisplay() {
+            document.getElementById('pumpStatus').textContent = systemState.waterPump;
+            document.getElementById('lightStatus').textContent = systemState.growLight;
+            document.getElementById('fanStatus').textContent = systemState.fan;
+            document.getElementById('fanSpeed').textContent = systemState.fanSpeed;
+            document.getElementById('mixerStatus').textContent = systemState.nutrientMixer;
+            document.getElementById('weatherStatus').textContent = systemState.weather;
+            document.getElementById('timeStatus').textContent = systemState.timeOfDay;
+            
+            // Update sensor displays
+            document.getElementById('waterLevel').textContent = systemState.sensorValues.WATER_LEVEL.toFixed(0);
+            document.getElementById('lightLevel').textContent = systemState.sensorValues.LIGHT_LEVEL.toFixed(0);
+            document.getElementById('pHLevel').textContent = systemState.sensorValues.PH_LEVEL.toFixed(1);
+            document.getElementById('temperature').textContent = systemState.sensorValues.TEMPERATURE.toFixed(1);
+            document.getElementById('humidity').textContent = systemState.sensorValues.HUMIDITY.toFixed(0);
+            document.getElementById('nutrientLevel').textContent = systemState.sensorValues.NUTRIENT_LEVEL.toFixed(0);
+            document.getElementById('co2Level').textContent = systemState.sensorValues.CO2_LEVEL.toFixed(0);
+            document.getElementById('waterTemp').textContent = systemState.sensorValues.WATER_TEMP.toFixed(1);
+            
+            // Update plant displays
+            document.getElementById('lettuceHeight').textContent = systemState.plantHeights.LETTUCE.toFixed(0);
+            document.getElementById('basilHeight').textContent = systemState.plantHeights.BASIL.toFixed(0);
+            document.getElementById('strawberryHeight').textContent = systemState.plantHeights.STRAWBERRY.toFixed(0);
+        }
+
+        // Helper function to add log entries
+        function addLogEntry(message, isError = false) {
+            const now = new Date();
+            const timeString = `[${now.getHours().toString().padStart(2, '0')}:` + 
+                            `${now.getMinutes().toString().padStart(2, '0')}:` + 
+                            `${now.getSeconds().toString().padStart(2, '0')}]`;
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            if (isError) entry.style.color = 'red';
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'log-time';
+            timeSpan.textContent = timeString;
+
+            entry.appendChild(timeSpan);
+            entry.appendChild(document.createTextNode(" " + message));
+
+            const container = document.getElementById('logContainer');
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Sensor functions
+        function getSensorValue(sensorType) {
+            // Add small random fluctuations to simulate real sensors
+            const baseValue = systemState.sensorValues[sensorType];
+            let fluctuation = 0;
+
+            switch(sensorType) {
+                case 'WATER_LEVEL':
+                    fluctuation = (Math.random() * 20 - 10);
+                    break;
+                case 'LIGHT_LEVEL':
+                    fluctuation = (Math.random() * 50 - 25);
+                    break;
+                case 'PH_LEVEL':
+                    fluctuation = (Math.random() * 0.2 - 0.1);
+                    break;
+                case 'TEMPERATURE':
+                case 'WATER_TEMP':
+                    fluctuation = (Math.random() * 0.5 - 0.25);
+                    break;
+                default:
+                    fluctuation = (Math.random() * 5 - 2.5);
+            }
+
+            let newValue = baseValue + fluctuation;
+
+            // Constrain values to realistic ranges
+            switch(sensorType) {
+                case 'WATER_LEVEL':
+                case 'NUTRIENT_LEVEL':
+                    newValue = Math.max(0, Math.min(1000, newValue));
+                    break;
+                case 'PH_LEVEL':
+                    newValue = Math.max(4.0, Math.min(8.0, newValue));
+                    break;
+                case 'TEMPERATURE':
+                    newValue = Math.max(10.0, Math.min(35.0, newValue));
+                    break;
+                case 'HUMIDITY':
+                    newValue = Math.max(20, Math.min(90, newValue));
+                    break;
+            }
+
+            return newValue;
+        }
+
+        function getPlantHeight(plantType) {
+            // Simulate plant growth with small random increments
+            const growthRate = {
+                LETTUCE: Math.random() * 2,
+                BASIL: Math.random() * 1.5,
+                STRAWBERRY: Math.random() * 1
+            };
+
+            systemState.plantHeights[plantType] = Math.min(
+                plantType === 'LETTUCE' ? 300 :
+                plantType === 'BASIL' ? 250 : 200,
+                systemState.plantHeights[plantType] + growthRate[plantType]
+            );
+
+            return systemState.plantHeights[plantType];
+        }
+
+        // Action implementations
+        function controlWaterPump(state, duration = 0) {
+            systemState.waterPump = state.includes('TIMED') ? `ON (${duration}s)` : state;
+            updateStatusDisplay();
+            addLogEntry(`Water pump turned ${state}${duration > 0 ? ' for ' + duration + ' seconds' : ''}`);
+
+            if (state.includes('TIMED')) {
+                setTimeout(() => {
+                    systemState.waterPump = 'OFF';
+                    updateStatusDisplay();
+                    addLogEntry('Water pump automatically turned OFF');
+                }, duration * 1000);
+            }
+        }
+
+        function controlGrowLight(state) {
+            systemState.growLight = state;
+            updateStatusDisplay();
+            addLogEntry(`Grow light set to ${state.toLowerCase()}`);
+        }
+
+        function controlFan(state) {
+            systemState.fan = state === 'ON' ? 'ON' : state === 'OFF' ? 'OFF' : state;
+            systemState.fanSpeed = state === 'LOW' ? 30 : state === 'HIGH' ? 70 : state === 'ON' ? 50 : 0;
+            updateStatusDisplay();
+            addLogEntry(`Fan set to ${state.toLowerCase()}`);
+        }
+
+        function setVentilation(percent) {
+            const speed = Math.max(0, Math.min(100, parseInt(percent)));
+            systemState.fanSpeed = speed;
+            systemState.fan = speed > 0 ? 'ON' : 'OFF';
+            updateStatusDisplay();
+            addLogEntry(`Ventilation set to ${speed}%`);
+        }
+
+        function controlNutrientMixer(state, duration = 0) {
+            systemState.nutrientMixer = state.includes('TIMED') ? `ON (${duration}s)` : state;
+            updateStatusDisplay();
+            addLogEntry(`Nutrient mixer turned ${state}${duration > 0 ? ' for ' + duration + ' seconds' : ''}`);
+
+            if (state.includes('TIMED')) {
+                setTimeout(() => {
+                    systemState.nutrientMixer = 'OFF';
+                    updateStatusDisplay();
+                    addLogEntry('Nutrient mixer automatically turned OFF');
+                }, duration * 1000);
+            }
+        }
+
+        function adjustPH(direction, amount) {
+            const change = parseFloat(amount) || 0;
+            if (direction === 'UP') {
+                systemState.sensorValues.PH_LEVEL = Math.min(8.0, systemState.sensorValues.PH_LEVEL + change);
+            } else {
+                systemState.sensorValues.PH_LEVEL = Math.max(4.0, systemState.sensorValues.PH_LEVEL - change);
+            }
+            updateStatusDisplay();
+            addLogEntry(`pH adjusted ${direction.toLowerCase()} by ${change.toFixed(1)}, now ${systemState.sensorValues.PH_LEVEL.toFixed(1)}`);
+        }
+
+        function setTemperature(temp) {
+            systemState.sensorValues.TEMPERATURE = parseFloat(temp) || 22.0;
+            updateStatusDisplay();
+            addLogEntry(`Temperature set to ${systemState.sensorValues.TEMPERATURE.toFixed(1)}°C`);
+        }
+
+        function addFertilizer(type, amount) {
+            const ml = parseFloat(amount) || 0;
+            systemState.sensorValues.NUTRIENT_LEVEL += ml;
+            updateStatusDisplay();
+            addLogEntry(`Added ${ml}ml of Type ${type} fertilizer`);
+        }
+
+        function addNutrients(amount) {
+            const ml = parseFloat(amount) || 0;
+            systemState.sensorValues.NUTRIENT_LEVEL += ml;
+            updateStatusDisplay();
+            addLogEntry(`Added ${ml}ml of nutrients`);
+        }
+
+        function logData(type) {
+            const now = new Date();
+            let message = '';
+
+            switch(type) {
+                case 'ALL':
+                    message = `Logged all sensor data at ${now.toLocaleTimeString()}`;
+                    break;
+                case 'WATER':
+                    message = `Water sensors: pH ${systemState.sensorValues.PH_LEVEL.toFixed(1)}, Level ${systemState.sensorValues.WATER_LEVEL.toFixed(0)}L, Temp ${systemState.sensorValues.WATER_TEMP.toFixed(1)}°C`;
+                    break;
+                case 'NUTRIENT':
+                    message = `Nutrient level: ${systemState.sensorValues.NUTRIENT_LEVEL.toFixed(0)}ppm`;
+                    break;
+                case 'ENV':
+                    message = `Environment: Temp ${systemState.sensorValues.TEMPERATURE.toFixed(1)}°C, Humidity ${systemState.sensorValues.HUMIDITY.toFixed(0)}%, CO2 ${systemState.sensorValues.CO2_LEVEL.toFixed(0)}ppm`;
+                    break;
+            }
+
+            addLogEntry(message);
+        }
+
+        function say(message) {
+            addLogEntry(`Message: ${message}`);
+        }
+
+        function scheduleDaily(time, callback) {
+            const [hours, minutes] = time.split(':').map(Number);
+            const now = new Date();
+            const scheduledTime = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hours,
+                minutes
+            );
+
+            if (scheduledTime < now) {
+                scheduledTime.setDate(scheduledTime.getDate() + 1);
+            }
+
+            const delay = scheduledTime - now;
+            const taskId = `daily-${time}`;
+
+            if (systemState.scheduledTasks[taskId]) {
+                clearTimeout(systemState.scheduledTasks[taskId]);
+            }
+
+            systemState.scheduledTasks[taskId] = setTimeout(() => {
+                addLogEntry(`Running daily task scheduled for ${time}`);
+                callback();
+                scheduleDaily(time, callback); // Reschedule for next day
+            }, delay);
+
+            addLogEntry(`Scheduled daily task at ${time}`);
+        }
+
+        function onWeather(weatherType, callback) {
+            if (!systemState.weatherCallbacks[weatherType]) {
+                systemState.weatherCallbacks[weatherType] = [];
+            }
+            systemState.weatherCallbacks[weatherType].push(callback);
+            addLogEntry(`Added weather trigger for ${weatherType.toLowerCase()}`);
+        }
+
+        // Simulate weather changes
+        function simulateWeather() {
+            const weatherTypes = ['Sunny', 'Cloudy', 'Rainy', 'Windy'];
+            const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+            systemState.weather = randomWeather;
+            updateStatusDisplay();
+            addLogEntry(`Weather changed to ${randomWeather}`);
+
+            // Trigger weather callbacks
+            if (systemState.weatherCallbacks[randomWeather.toUpperCase()]) {
+                systemState.weatherCallbacks[randomWeather.toUpperCase()].forEach(cb => cb());
+            }
+        }
+
+        // Simulate day/night cycle
+        function simulateDayNight() {
+            const now = new Date();
+            const hours = now.getHours();
+            const isDay = hours >= 6 && hours < 18;
+            systemState.timeOfDay = isDay ? 'Day' : 'Night';
+            updateStatusDisplay();
+        }
+
+        // Chart for sensor data visualization
+        const ctx = document.getElementById('sensorChart').getContext('2d');
+        const sensorChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(10).fill().map((_, i) => i + 's'),
+                datasets: [
+                    {
+                        label: 'Water Level',
+                        data: Array(10).fill(500),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'pH Level',
+                        data: Array(10).fill(6.2),
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Update sensor data periodically
+        function updateSensorData() {
+            // Update all sensor values with random fluctuations
+            for (const sensor in systemState.sensorValues) {
+                systemState.sensorValues[sensor] = getSensorValue(sensor);
+            }
+
+            // Update plant heights
+            for (const plant in systemState.plantHeights) {
+                systemState.plantHeights[plant] = getPlantHeight(plant);
+            }
+
+            updateStatusDisplay();
+
+            // Update chart
+            sensorChart.data.datasets[0].data.shift();
+            sensorChart.data.datasets[0].data.push(systemState.sensorValues.WATER_LEVEL);
+            sensorChart.data.datasets[1].data.shift();
+            sensorChart.data.datasets[1].data.push(systemState.sensorValues.PH_LEVEL * 100);
+            sensorChart.update();
+        }
+
+        // Button event handlers
+        document.getElementById('runBtn').addEventListener('click', async function() {
+            addLogEntry("Program started running");
+
+            // Generate and execute JavaScript code from Blockly
+            const code = Blockly.JavaScript.workspaceToCode(workspace);
+
+            try {
+                // Create an async function with our utilities
+                const execute = new Function(
+                    'getSensorValue',
+                    'getPlantHeight',
+                    'controlWaterPump',
+                    'controlGrowLight',
+                    'controlFan',
+                    'setVentilation',
+                    'controlNutrientMixer',
+                    'adjustPH',
+                    'setTemperature',
+                    'addFertilizer',
+                    'addNutrients',
+                    'logData',
+                    'say',
+                    'scheduleDaily',
+                    'onWeather',
+                    'addLogEntry',
+                    'systemState',
+                    `
+                    // Helper function to get variable value
+                    function getVar(name) {
+                        return systemState.variables[name] != undefined ? systemState.variables[name] : null;
+                    }
+                    
+                    // Helper function to set variable value
+                    function setVar(name, value) {
+                        systemState.variables[name] = value;
+                    }
+                    
+                    // Helper function to change variable value
+                    function changeVar(name, delta) {
+                        if (systemState.variables[name] == undefined) {
+                            systemState.variables[name] = 0;
+                        }
+                        systemState.variables[name] += delta;
+                    }
+                    
+                    async function runProgram() {
+                        try {
+                            ${code}
+                            addLogEntry("Program completed successfully");
+                        } catch (e) {
+                            addLogEntry("Error: " + e.message, true);
+                        }
+                    }
+                    
+                    return runProgram();
+                    `
+                );
+
+                // Execute with our simulation functions
+                await execute(
+                    getSensorValue,
+                    getPlantHeight,
+                    controlWaterPump,
+                    controlGrowLight,
+                    controlFan,
+                    setVentilation,
+                    controlNutrientMixer,
+                    adjustPH,
+                    setTemperature,
+                    addFertilizer,
+                    addNutrients,
+                    logData,
+                    say,
+                    scheduleDaily,
+                    onWeather,
+                    addLogEntry,
+                    systemState
+                );
+
+            } catch (e) {
+                addLogEntry("Error in program: " + e.message, true);
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', function() {
+            addLogEntry("Program stopped");
+            // Clear all scheduled tasks
+            Object.values(systemState.scheduledTasks).forEach(clearTimeout);
+            systemState.scheduledTasks = {};
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            addLogEntry("System reset");
+            // Reset all sensors to default values
+            systemState.sensorValues = {
+                WATER_LEVEL: 500,
+                LIGHT_LEVEL: 650,
+                PH_LEVEL: 6.2,
+                TEMPERATURE: 22.5,
+                HUMIDITY: 65,
+                NUTRIENT_LEVEL: 320,
+                CO2_LEVEL: 450,
+                WATER_TEMP: 20.0,
+                AIR_FLOW: 30
+            };
+            systemState.plantHeights = {
+                LETTUCE: 120,
+                BASIL: 85,
+                STRAWBERRY: 65
+            };
+            systemState.waterPump = 'OFF';
+            systemState.growLight = 'ON';
+            systemState.fan = 'LOW';
+            systemState.fanSpeed = 30;
+            systemState.nutrientMixer = 'OFF';
+            updateStatusDisplay();
+        });
+
+        document.getElementById('clearLogBtn').addEventListener('click', function() {
+            document.getElementById('logContainer').innerHTML = '';
+        });
+
+        document.getElementById('demoBtn').addEventListener('click', function() {
+            addLogEntry("Loading demo program");
+            // Load a demo program into Blockly
+            // This would be more complex in a real implementation
+            // For now, just add some example blocks
+            const ifBlock = workspace.newBlock('hydroponic_if');
+            ifBlock.initSvg();
+            ifBlock.render();
+
+            const sensorBlock = workspace.newBlock('read_sensor');
+            sensorBlock.initSvg();
+            sensorBlock.render();
+
+            const pumpBlock = workspace.newBlock('water_pump_control');
+            pumpBlock.initSvg();
+            pumpBlock.render();
+
+            // Connect the blocks
+            ifBlock.getInput('CONDITION').connection.connect(sensorBlock.outputConnection);
+            ifBlock.getInput('DO').connection.connect(pumpBlock.previousConnection);
+        });
+
+        // Update simulation periodically
+        setInterval(updateSensorData, 2000);
+        setInterval(simulateWeather, 30000);
+        setInterval(simulateDayNight, 60000);
+
+        // Initialize display
+        updateStatusDisplay();
+
+</script>
+
+<script>
+// ===================================
+// STANDALONE VISUAL SIMULATION SYSTEM
+// ===================================
+
+class HydroponicVisualization {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
+        // Simulation state
+        this.timeScale = 1.0;
+        this.isPaused = false;
+        this.lastFrameTime = 0;
+        
+        // Visual effects
+        this.ripples = [];
+        this.weatherEffects = [];
+        
+        // Start rendering
+        requestAnimationFrame((t) => this.render(t));
+    }
+    
+    resizeCanvas() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+    }
+    
+    render(timestamp) {
+        if (!this.lastFrameTime) this.lastFrameTime = timestamp;
+        const deltaTime = (timestamp - this.lastFrameTime) * this.timeScale;
+        this.lastFrameTime = timestamp;
+        
+        if (!this.isPaused) {
+            this.updateEffects(deltaTime);
+            this.drawScene();
+        }
+        
+        requestAnimationFrame((t) => this.render(t));
+    }
+    
+    updateEffects(deltaTime) {
+        // Update water ripples from pump activity
+        if (systemState.waterPump !== 'OFF' && Math.random() < 0.05) {
+            this.ripples.push({
+                x: 0.1 + Math.random() * 0.1,
+                y: 0.7 - (systemState.sensorValues.WATER_LEVEL / 1000 * 0.5),
+                radius: 0.005,
+                growthRate: 0.002,
+                alpha: 0.8,
+                lifetime: 1.5
+            });
+        }
+        
+        this.ripples = this.ripples.filter(r => {
+            r.radius += r.growthRate * (deltaTime / 16);
+            r.alpha -= 0.01 * (deltaTime / 16);
+            return r.alpha > 0 && r.radius < 0.2;
+        });
+        
+        // Update weather effects
+        this.updateWeatherEffects(deltaTime);
+    }
+    
+    updateWeatherEffects(deltaTime) {
+        // Clear old effects
+        this.weatherEffects = this.weatherEffects.filter(e => e.lifetime > 0);
+        
+        // Add new effects based on weather
+        if (systemState.weather === 'Rainy' && Math.random() < 0.3) {
+            this.weatherEffects.push({
+                type: 'rain',
+                x: Math.random(),
+                y: -0.05,
+                speed: 0.1 + Math.random() * 0.2,
+                length: 0.02 + Math.random() * 0.03,
+                lifetime: 100
+            });
+        }
+        
+        // Update existing effects
+        this.weatherEffects.forEach(e => {
+            e.lifetime -= deltaTime / 1000;
+            if (e.type === 'rain') {
+                e.y += e.speed * (deltaTime / 16);
+            }
+        });
+    }
+    
+    drawScene() {
+        const ctx = this.ctx;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw sky background
+        this.drawSky(width, height);
+        
+        // Draw weather effects
+        this.drawWeather(width, height);
+        
+        // Draw greenhouse structure
+        this.drawGreenhouse(width, height);
+        
+        // Draw water tank and plants
+        this.drawHydroponicSystem(width, height);
+    }
+    
+    drawSky(width, height) {
+        const ctx = this.ctx;
+        
+        // Sky gradient
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, height * 0.6);
+        
+        if (systemState.timeOfDay === 'Day') {
+            skyGradient.addColorStop(0, systemState.weather === 'Sunny' ? '#87CEEB' : '#A9A9A9');
+            skyGradient.addColorStop(1, systemState.weather === 'Sunny' ? '#E0F7FF' : '#D3D3D3');
+        } else {
+            skyGradient.addColorStop(0, '#0F0526');
+            skyGradient.addColorStop(1, '#1A1033');
+        }
+        
+        ctx.fillStyle = skyGradient;
+        ctx.fillRect(0, 0, width, height * 0.6);
+        
+        // Draw sun/moon
+        const celestialSize = height * 0.08;
+        const celestialX = width * 0.8;
+        const celestialY = height * 0.15;
+        
+        ctx.fillStyle = systemState.timeOfDay === 'Day' ? '#FDB813' : '#E6E6FA';
+        ctx.beginPath();
+        ctx.arc(celestialX, celestialY, celestialSize, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    drawWeather(width, height) {
+        const ctx = this.ctx;
+        
+        // Draw weather particles
+        this.weatherEffects.forEach(effect => {
+            if (effect.type === 'rain') {
+                ctx.strokeStyle = `rgba(200, 200, 255, ${Math.min(0.7, effect.lifetime / 2)})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(effect.x * width, effect.y * height);
+                ctx.lineTo(effect.x * width, effect.y * height + effect.length * height);
+                ctx.stroke();
+            }
+        });
+    }
+    
+    drawGreenhouse(width, height) {
+        const ctx = this.ctx;
+        
+        // Greenhouse frame
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(width * 0.3, height * 0.2, width * 0.6, height * 0.5);
+        
+        // Transparent panels
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.15)';
+        ctx.fillRect(width * 0.3, height * 0.2, width * 0.6, height * 0.5);
+    }
+    
+    drawHydroponicSystem(width, height) {
+        const ctx = this.ctx;
+        
+        // Draw water tank
+        this.drawWaterTank(width, height);
+        
+        // Draw plants
+        this.drawPlants(width, height);
+    }
+    
+    drawWaterTank(width, height) {
+        const ctx = this.ctx;
+        const waterLevel = systemState.sensorValues.WATER_LEVEL / 1000;
+        const pH = systemState.sensorValues.PH_LEVEL;
+        
+        // Tank dimensions
+        const tankX = width * 0.1;
+        const tankY = height * 0.5;
+        const tankWidth = width * 0.2;
+        const tankHeight = height * 0.4;
+        
+        // Tank outline
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(tankX, tankY, tankWidth, tankHeight);
+        
+        // Water color based on pH
+        let waterColor;
+        if (pH < 5.5) {
+            const acidity = (5.5 - pH) / 3;
+            waterColor = `rgba(255, ${200 - 150 * acidity}, ${200 - 150 * acidity}, 0.7)`;
+        } else if (pH > 7.5) {
+            const alkalinity = (pH - 7.5) / 3;
+            waterColor = `rgba(${200 - 150 * alkalinity}, ${200 - 150 * alkalinity}, 255, 0.7)`;
+        } else {
+            waterColor = 'rgba(100, 200, 255, 0.7)';
+        }
+        
+        // Draw water
+        ctx.fillStyle = waterColor;
+        ctx.fillRect(
+            tankX, 
+            tankY + tankHeight * (1 - waterLevel), 
+            tankWidth, 
+            tankHeight * waterLevel
+        );
+        
+        // Draw ripples
+        this.ripples.forEach(ripple => {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${ripple.alpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(
+                tankX + ripple.x * width,
+                tankY + tankHeight * (1 - waterLevel) + ripple.y * height,
+                ripple.radius * width,
+                0,
+                Math.PI * 2
+            );
+            ctx.stroke();
+        });
+    }
+    
+    drawPlants(width, height) {
+        const ctx = this.ctx;
+        const plants = [
+            { type: 'lettuce', height: systemState.plantHeights.LETTUCE / 300 },
+            { type: 'basil', height: systemState.plantHeights.BASIL / 250 },
+            { type: 'strawberry', height: systemState.plantHeights.STRAWBERRY / 200 }
+        ];
+        
+        // Calculate plant health (simplified)
+        const health = Math.min(1, 
+            (systemState.sensorValues.NUTRIENT_LEVEL / 500) * 0.6 + 
+            (1 - Math.abs(6.5 - systemState.sensorValues.PH_LEVEL) / 2) * 0.4
+        );
+        
+        plants.forEach((plant, i) => {
+            const x = width * (0.4 + i * 0.2);
+            const plantHeight = height * 0.3 * plant.height;
+            const plantWidth = width * 0.03;
+            
+            // Stem color based on health
+            const hue = 100 * health;
+            const saturation = 80;
+            const lightness = 30 + 30 * health;
+            ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            
+            // Draw stem
+            ctx.fillRect(x - plantWidth/2, height * 0.7 - plantHeight, plantWidth, plantHeight);
+            
+            // Draw leaves
+            for (let j = 0; j < 3; j++) {
+                const leafY = height * 0.7 - plantHeight + (j * plantHeight / 3);
+                const leafSize = height * 0.05 + j * height * 0.01;
+                
+                // Left leaf
+                ctx.beginPath();
+                ctx.moveTo(x - plantWidth/2, leafY);
+                ctx.lineTo(x - plantWidth/2 - leafSize, leafY - leafSize/2);
+                ctx.lineTo(x - plantWidth/2 - leafSize, leafY + leafSize/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Right leaf
+                ctx.beginPath();
+                ctx.moveTo(x + plantWidth/2, leafY);
+                ctx.lineTo(x + plantWidth/2 + leafSize, leafY - leafSize/2);
+                ctx.lineTo(x + plantWidth/2 + leafSize, leafY + leafSize/2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        });
+    }
+    
+    setSpeed(speed) {
+        this.timeScale = speed;
+    }
+    
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        return this.isPaused;
+    }
+    
+    reset() {
+        this.ripples = [];
+        this.weatherEffects = [];
+    }
+}
+
+// Initialize visualization system
+let hydroponicViz;
+
+function initVisualization() {
+    hydroponicViz = new HydroponicVisualization('simCanvas');
+    
+    // Set up control buttons
+    document.getElementById('simSpeedUp').addEventListener('click', () => {
+        hydroponicViz.setSpeed(2.0);
+    });
+    
+    document.getElementById('simSlowDown').addEventListener('click', () => {
+        hydroponicViz.setSpeed(0.5);
+    });
+    
+    document.getElementById('simPause').addEventListener('click', () => {
+        const isPaused = hydroponicViz.togglePause();
+        document.getElementById('simPause').textContent = isPaused ? 'Resume' : 'Pause';
+    });
+    
+    document.getElementById('simReset').addEventListener('click', () => {
+        hydroponicViz.reset();
+    });
+}
+
+// Alert system
+function updateAlerts() {
+    const alertContainer = document.getElementById('simAlerts');
+    alertContainer.innerHTML = '';
+    
+    // Critical alerts
+    if (systemState.sensorValues.WATER_LEVEL < 100) {
+        addAlert('CRITICAL: Water level dangerously low (<100L)', 'critical');
+    }
+    
+    if (systemState.sensorValues.PH_LEVEL < 4.5 || systemState.sensorValues.PH_LEVEL > 8.5) {
+        addAlert(`CRITICAL: Extreme pH (${systemState.sensorValues.PH_LEVEL.toFixed(1)})`, 'critical');
+    }
+    
+    // Warnings
+    if (systemState.sensorValues.PH_LEVEL < 5.5 || systemState.sensorValues.PH_LEVEL > 7.5) {
+        addAlert(`WARNING: Suboptimal pH (${systemState.sensorValues.PH_LEVEL.toFixed(1)})`, 'warning');
+    }
+    
+    if (systemState.sensorValues.NUTRIENT_LEVEL < 150) {
+        addAlert('WARNING: Low nutrients (<150ppm)', 'warning');
+    }
+    
+    if (systemState.sensorValues.TEMPERATURE > 28 || systemState.sensorValues.TEMPERATURE < 18) {
+        addAlert(`WARNING: Temperature extreme (${systemState.sensorValues.TEMPERATURE.toFixed(1)}°C)`, 'warning');
+    }
+    
+    // Info alerts
+    if (systemState.waterPump !== 'OFF') {
+        addAlert(`INFO: Water pump ${systemState.waterPump}`, 'info');
+    }
+    
+    if (systemState.nutrientMixer !== 'OFF') {
+        addAlert(`INFO: Nutrient mixer ${systemState.nutrientMixer}`, 'info');
+    }
+    
+    function addAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `sim-alert ${type}`;
+        alert.textContent = message;
+        alertContainer.appendChild(alert);
+        alertContainer.scrollTop = alertContainer.scrollHeight;
+    }
+}
+
+// Initialize when page loads
+window.addEventListener('load', () => {
+    initVisualization();
+    
+    // Update alerts when system state changes
+    const originalUpdate = updateStatusDisplay;
+    updateStatusDisplay = function() {
+        originalUpdate();
+        updateAlerts();
+    };
+});
+</script>
+
+<script>
+    //=====================
+    // System Simulation
+    //=====================
+const systemState = {
+  waterPump: 'OFF',
+  growLight: 'ON',
+  fan: 'LOW',
+  fanSpeed: 30,
+  nutrientMixer: 'OFF',
+  sensorValues: {
+    WATER_LEVEL: 500,
+    LIGHT_LEVEL: 650,
+    PH_LEVEL: 6.2,
+    TEMPERATURE: 22.5,
+    HUMIDITY: 65,
+    NUTRIENT_LEVEL: 320,
+    CO2_LEVEL: 450,
+    WATER_TEMP: 20.0,
+    AIR_FLOW: 30
+  },
+  plantHeights: {
+    LETTUCE: 120,
+    BASIL: 85,
+    STRAWBERRY: 65
+  },
+  weather: 'Sunny',
+  timeOfDay: 'Day',
+  scheduledTasks: {},
+  weatherCallbacks: {},
+  variables: {}
+};
+
+// =================
+// UPDATE ALL DISPLAYS
+// =================
+function updateAllDisplays() {
+  // Update sensor displays
+  document.getElementById('waterLevel').textContent = systemState.sensorValues.WATER_LEVEL.toFixed(0);
+  document.getElementById('lightLevel').textContent = systemState.sensorValues.LIGHT_LEVEL.toFixed(0);
+  document.getElementById('pHLevel').textContent = systemState.sensorValues.PH_LEVEL.toFixed(1);
+  document.getElementById('temperature').textContent = systemState.sensorValues.TEMPERATURE.toFixed(1);
+  document.getElementById('humidity').textContent = systemState.sensorValues.HUMIDITY.toFixed(0);
+  document.getElementById('nutrientLevel').textContent = systemState.sensorValues.NUTRIENT_LEVEL.toFixed(0);
+  document.getElementById('co2Level').textContent = systemState.sensorValues.CO2_LEVEL.toFixed(0);
+  document.getElementById('waterTemp').textContent = systemState.sensorValues.WATER_TEMP.toFixed(1);
+
+  // Update system status
+  document.getElementById('pumpStatus').textContent = systemState.waterPump;
+  document.getElementById('lightStatus').textContent = systemState.growLight;
+  document.getElementById('fanStatus').textContent = systemState.fan;
+  document.getElementById('fanSpeed').textContent = systemState.fanSpeed;
+  document.getElementById('mixerStatus').textContent = systemState.nutrientMixer;
+  document.getElementById('weatherStatus').textContent = systemState.weather;
+  document.getElementById('timeStatus').textContent = systemState.timeOfDay;
+
+  // Update plant displays
+  document.getElementById('lettuceHeight').textContent = systemState.plantHeights.LETTUCE.toFixed(0);
+  document.getElementById('basilHeight').textContent = systemState.plantHeights.BASIL.toFixed(0);
+  document.getElementById('strawberryHeight').textContent = systemState.plantHeights.STRAWBERRY.toFixed(0);
+  
+  // Update plant health indicators
+  updatePlantHealth();
+  
+  // Update simulation environment
+  if (window.simulationRenderer) {
+    simulationRenderer.updateFromSystemState(systemState);
+  }
+  
+  // Update chart if exists
+  if (window.sensorChart) {
+    updateSensorChart();
+  }
+}
+
+function updatePlantHealth() {
+  // Calculate health based on nutrients and pH (simplified)
+  const health = Math.min(1, Math.max(0, 
+    (systemState.sensorValues.NUTRIENT_LEVEL / 500) * 0.7 + 
+    (1 - Math.abs(6.5 - systemState.sensorValues.PH_LEVEL) / 2.5) * 0.3
+  ));
+  
+  // Update health bars
+  document.getElementById('lettuceHealth').style.width = `${health * 100}%`;
+  document.getElementById('basilHealth').style.width = `${health * 100}%`;
+  document.getElementById('strawberryHealth').style.width = `${health * 100}%`;
+}
+
+// =================
+// BUTTON FUNCTIONALITY
+// =================
+document.getElementById('runBtn').addEventListener('click', async function() {
+  addLogEntry("Program started running");
+  const code = Blockly.JavaScript.workspaceToCode(workspace);
+  
+  try {
+    const execute = new Function(`
+      // Helper functions
+      function getVar(name) {
+        return systemState.variables[name] != undefined ? systemState.variables[name] : null;
+      }
+      
+      function setVar(name, value) {
+        systemState.variables[name] = value;
+      }
+      
+      function changeVar(name, delta) {
+        if (systemState.variables[name] == undefined) {
+          systemState.variables[name] = 0;
+        }
+        systemState.variables[name] += delta;
+      }
+      
+      // Sensor functions
+      function getSensorValue(sensorType) {
+        return systemState.sensorValues[sensorType];
+      }
+      
+      function getPlantHeight(plantType) {
+        return systemState.plantHeights[plantType];
+      }
+      
+      // Action functions
+      ${code}
+    `);
+    
+    await execute();
+    addLogEntry("Program completed successfully");
+  } catch (e) {
+    addLogEntry(`Error: ${e.message}`, true);
+  }
+  
+  updateAllDisplays();
+});
+
+document.getElementById('stopBtn').addEventListener('click', function() {
+  addLogEntry("Program stopped by user");
+  // Clear all scheduled tasks
+  Object.values(systemState.scheduledTasks).forEach(clearTimeout);
+  systemState.scheduledTasks = {};
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+  // Reset all system values to defaults
+  systemState.waterPump = 'OFF';
+  systemState.growLight = 'ON';
+  systemState.fan = 'LOW';
+  systemState.fanSpeed = 30;
+  systemState.nutrientMixer = 'OFF';
+  
+  systemState.sensorValues = {
+    WATER_LEVEL: 500,
+    LIGHT_LEVEL: 650,
+    PH_LEVEL: 6.2,
+    TEMPERATURE: 22.5,
+    HUMIDITY: 65,
+    NUTRIENT_LEVEL: 320,
+    CO2_LEVEL: 450,
+    WATER_TEMP: 20.0,
+    AIR_FLOW: 30
+  };
+  
+  systemState.plantHeights = {
+    LETTUCE: 120,
+    BASIL: 85,
+    STRAWBERRY: 65
+  };
+  
+  addLogEntry("System reset to default values");
+  updateAllDisplays();
+});
+
+document.getElementById('clearLogBtn').addEventListener('click', function() {
+  document.getElementById('logContainer').innerHTML = '';
+});
+
+// =================
+// LOGGING FUNCTIONS
+// =================
+function addLogEntry(message, isError = false) {
+  const now = new Date();
+  const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+  
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  if (isError) entry.style.color = 'red';
+  
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'log-time';
+  timeSpan.textContent = timeString;
+  
+  entry.appendChild(timeSpan);
+  entry.appendChild(document.createTextNode(` ${message}`));
+  
+  const container = document.getElementById('logContainer');
+  container.appendChild(entry);
+  container.scrollTop = container.scrollHeight;
+}
+
+// =================
+// BLOCKLY ACTION IMPLEMENTATIONS
+// =================
+function controlWaterPump(state, duration = 0) {
+  systemState.waterPump = state.includes('TIMED') ? `ON (${duration}s)` : state;
+  addLogEntry(`Water pump turned ${state}${duration > 0 ? ' for ' + duration + ' seconds' : ''}`);
+  
+  if (state.includes('TIMED')) {
+    setTimeout(() => {
+      systemState.waterPump = 'OFF';
+      addLogEntry('Water pump automatically turned OFF');
+      updateAllDisplays();
+    }, duration * 1000);
+  }
+  
+  // Simulate water level change
+  if (state !== 'OFF') {
+    systemState.sensorValues.WATER_LEVEL = Math.max(0, systemState.sensorValues.WATER_LEVEL - 10);
+  }
+  
+  updateAllDisplays();
+}
+
+function controlGrowLight(state) {
+  systemState.growLight = state;
+  addLogEntry(`Grow light set to ${state.toLowerCase()}`);
+  
+  // Simulate light effect
+  systemState.sensorValues.LIGHT_LEVEL = state === 'OFF' ? 0 : 650;
+  updateAllDisplays();
+}
+
+// ======================
+// ACTION IMPLEMENTATIONS
+// ======================
+
+function controlFan(state) {
+    systemState.fan = state === 'ON' ? 'ON' : state === 'OFF' ? 'OFF' : state;
+    systemState.fanSpeed = state === 'LOW' ? 30 : state === 'HIGH' ? 70 : state === 'ON' ? 50 : systemState.fanSpeed;
+    
+    // Simulate air flow change
+    systemState.sensorValues.AIR_FLOW = 
+        state === 'OFF' ? 0 : 
+        state === 'LOW' ? 30 : 
+        state === 'HIGH' ? 70 : 50;
+    
+    addLogEntry(`Fan set to ${state.toLowerCase()}`);
+    updateAllDisplays();
+}
+
+function setVentilation(percent) {
+    const speed = Math.max(0, Math.min(100, parseInt(percent)));
+    systemState.fanSpeed = speed;
+    systemState.fan = speed > 0 ? 'ON' : 'OFF';
+    systemState.sensorValues.AIR_FLOW = speed;
+    
+    addLogEntry(`Ventilation set to ${speed}%`);
+    updateAllDisplays();
+}
+
+function controlNutrientMixer(state, duration = 0) {
+    systemState.nutrientMixer = state.includes("TIMED") ? `ON (${duration}s)` : state;
+    addLogEntry(`Nutrient mixer turned ${state}${duration > 0 ? ' for '+ duration + ' seconds' : ''}`);
+    
+    if (state.includes("TIMED")) {
+        setTimeout(() => {
+            systemState.nutrientMixer = 'OFF';
+            addLogEntry('Nutrient mixer automatically turned OFF');
+            updateAllDisplays();
+        }, duration * 1000);
+    }
+    
+    // Simulate nutrient distribution
+    if (state !== 'OFF') {
+        systemState.sensorValues.NUTRIENT_LEVEL = Math.min(1000, 
+            systemState.sensorValues.NUTRIENT_LEVEL + 5
+        );
+    }
+    
+    updateAllDisplays();
+}
+
+function adjustPH(direction, amount) {
+    const change = parseFloat(amount) || 0;
+    const currentPH = systemState.sensorValues.PH_LEVEL;
+    
+    if (direction === 'UP') {
+        systemState.sensorValues.PH_LEVEL = Math.min(9.0, currentPH + change);
+    } else {
+        systemState.sensorValues.PH_LEVEL = Math.max(4.0, currentPH - change);
+    }
+    
+    addLogEntry(`pH adjusted ${direction.toLowerCase()} by ${change.toFixed(1)}, now ${systemState.sensorValues.PH_LEVEL.toFixed(1)}`);
+    updateAllDisplays();
+}
+
+function setTemperature(temp) {
+    const newTemp = parseFloat(temp) || 22.0;
+    systemState.sensorValues.TEMPERATURE = Math.max(10.0, Math.min(35.0, newTemp));
+    
+    // Simulate effect on water temperature
+    systemState.sensorValues.WATER_TEMP = Math.max(15.0, 
+        Math.min(28.0, systemState.sensorValues.WATER_TEMP + (newTemp - systemState.sensorValues.TEMPERATURE) * 0.1)
+    );
+    
+    addLogEntry(`Temperature set to ${newTemp.toFixed(1)}°C`);
+    updateAllDisplays();
+}
+
+function addFertilizer(type, amount) {
+    const ml = parseFloat(amount) || 0;
+    let effectiveness = 1.0;
+    
+    // Different fertilizer types have different effectiveness
+    switch(type) {
+        case 'A': effectiveness = 1.2; break; // Type A is more effective
+        case 'B': effectiveness = 1.0; break; // Type B is standard
+        case 'C': effectiveness = 0.8; break; // Type C is less effective
+    }
+    
+    systemState.sensorValues.NUTRIENT_LEVEL = Math.min(1000, 
+        systemState.sensorValues.NUTRIENT_LEVEL + (ml * effectiveness)
+    );
+    
+    addLogEntry(`Added ${ml}ml of Type ${type} fertilizer`);
+    updateAllDisplays();
+}
+
+function addNutrients(amount) {
+    const ml = parseFloat(amount) || 0;
+    systemState.sensorValues.NUTRIENT_LEVEL = Math.min(1000, 
+        systemState.sensorValues.NUTRIENT_LEVEL + ml
+    );
+    
+    addLogEntry(`Added ${ml}ml of nutrients`);
+    updateAllDisplays();
+}
+
+function logData(type) {
+    const now = new Date();
+    let message = "";
+    
+    switch(type) {
+        case 'ALL':
+            message = `System status at ${now.toLocaleTimeString()}:\n` +
+                     `- Water: ${systemState.sensorValues.WATER_LEVEL}L, pH ${systemState.sensorValues.PH_LEVEL.toFixed(1)}\n` +
+                     `- Environment: ${systemState.sensorValues.TEMPERATURE}°C, ${systemState.sensorValues.HUMIDITY}% RH\n` +
+                     `- Nutrients: ${systemState.sensorValues.NUTRIENT_LEVEL}ppm`;
+            break;
+            
+        case 'WATER':
+            message = `Water status: ${systemState.sensorValues.WATER_LEVEL}L, ` +
+                      `pH ${systemState.sensorValues.PH_LEVEL.toFixed(1)}, ` +
+                      `${systemState.sensorValues.WATER_TEMP.toFixed(1)}°C`;
+            break;
+            
+        case 'NUTRIENT':
+            message = `Nutrient level: ${systemState.sensorValues.NUTRIENT_LEVEL}ppm`;
+            break;
+            
+        case 'ENV':
+            message = `Environment: ${systemState.sensorValues.TEMPERATURE.toFixed(1)}°C, ` +
+                      `${systemState.sensorValues.HUMIDITY}% RH, ` +
+                      `${systemState.sensorValues.CO2_LEVEL}ppm CO₂`;
+            break;
+    }
+    
+    addLogEntry(message);
+}
+
+function say(message) {
+    addLogEntry(`System message: ${message}`);
+}
+
+function scheduleDaily(time, callback) {
+    const [hours, minutes] = time.split(':').map(Number);
+    const now = new Date();
+    const scheduledTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hours,
+        minutes
+    );
+
+    if (scheduledTime < now) {
+        scheduledTime.setDate(scheduledTime.getDate() + 1);
+    }
+
+    const delay = scheduledTime - now;
+    const taskId = `daily-${time}`;
+
+    if (systemState.scheduledTasks[taskId]) {
+        clearTimeout(systemState.scheduledTasks[taskId]);
+    }
+
+    systemState.scheduledTasks[taskId] = setTimeout(() => {
+        addLogEntry(`Executing daily task scheduled for ${time}`);
+        try {
+            callback();
+        } catch (e) {
+            addLogEntry(`Error in scheduled task: ${e.message}`, true);
+        }
+        scheduleDaily(time, callback); // Reschedule
+    }, delay);
+
+    addLogEntry(`Scheduled daily task at ${time}`);
+}
+
+function onWeather(weatherType, callback) {
+    if (!systemState.weatherCallbacks[weatherType]) {
+        systemState.weatherCallbacks[weatherType] = [];
+    }
+    systemState.weatherCallbacks[weatherType].push(callback);
+    addLogEntry(`Added weather trigger for ${weatherType.toLowerCase()}`);
+}
+
+// ======================
+// HELPER FUNCTIONS
+// ======================
+
+function getSensorValue(sensorType) {
+    // Add small random fluctuations to simulate real sensors
+    let value = systemState.sensorValues[sensorType];
+    let fluctuation = 0;
+    
+    switch(sensorType) {
+        case 'WATER_LEVEL':
+            fluctuation = (Math.random() * 20 - 10);
+            value = Math.max(0, value + fluctuation);
+            break;
+            
+        case 'LIGHT_LEVEL':
+            fluctuation = (Math.random() * 50 - 25);
+            value = Math.max(0, systemState.growLight === 'OFF' ? 0 : 650 + fluctuation);
+            break;
+            
+        case 'PH_LEVEL':
+            fluctuation = (Math.random() * 0.2 - 0.1);
+            value += fluctuation;
+            break;
+            
+        case 'TEMPERATURE':
+        case 'WATER_TEMP':
+            fluctuation = (Math.random() * 0.5 - 0.25);
+            value += fluctuation;
+            break;
+            
+        default:
+            fluctuation = (Math.random() * 5 - 2.5);
+            value += fluctuation;
+    }
+    
+    // Constrain to realistic values
+    switch(sensorType) {
+        case 'WATER_LEVEL':
+        case 'NUTRIENT_LEVEL':
+            value = Math.max(0, Math.min(1000, value));
+            break;
+        case 'PH_LEVEL':
+            value = Math.max(4.0, Math.min(9.0, value));
+            break;
+        case 'TEMPERATURE':
+            value = Math.max(10.0, Math.min(35.0, value));
+            break;
+        case 'HUMIDITY':
+            value = Math.max(20, Math.min(90, value));
+            break;
+    }
+    
+    return value;
+}
+
+function getPlantHeight(plantType) {
+    // Simulate plant growth
+    const growthRate = {
+        LETTUCE: Math.random() * 0.5,
+        BASIL: Math.random() * 0.3,
+        STRAWBERRY: Math.random() * 0.2
+    };
+    
+    // Health factor (0-1) affects growth
+    const healthFactor = Math.min(1, 
+        (systemState.sensorValues.NUTRIENT_LEVEL / 500) * 0.6 + 
+        (1 - Math.abs(6.5 - systemState.sensorValues.PH_LEVEL) / 2.5) * 0.4
+    );
+    
+    systemState.plantHeights[plantType] = Math.min(
+        plantType === 'LETTUCE' ? 300 :
+        plantType === 'BASIL' ? 250 : 200,
+        systemState.plantHeights[plantType] + (growthRate[plantType] * healthFactor)
+    );
+    
+    return systemState.plantHeights[plantType];
+}
+
+// =================
+// INITIALIZATION
+// =================
+window.addEventListener('load', function() {
+  // Initialize Blockly workspace
+  const workspace = Blockly.inject('blocklyDiv', {
+    toolbox: document.getElementById('toolbox'),
+    grid: {
+      spacing: 20,
+      length: 3,
+      colour: '#ccc',
+      snap: true
+    },
+    zoom: {
+      controls: true,
+      wheel: true
+    }
+  });
+  
+  // Initialize simulation renderer if exists
+  if (typeof VisualSimulation !== 'undefined') {
+    window.simulationRenderer = new VisualSimulation('simCanvas');
+  }
+  
+  // Initialize chart if exists
+  if (typeof Chart !== 'undefined') {
+    initSensorChart();
+  }
+  
+  // Set initial display values
+  updateAllDisplays();
+});
+
+function initSensorChart() {
+  const ctx = document.getElementById('sensorChart').getContext('2d');
+  window.sensorChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array(10).fill().map((_, i) => i + 's'),
+      datasets: [
+        {
+          label: 'Water Level',
+          data: Array(10).fill(systemState.sensorValues.WATER_LEVEL),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        },
+        {
+          label: 'pH Level',
+          data: Array(10).fill(systemState.sensorValues.PH_LEVEL * 100),
+          borderColor: 'rgb(255, 99, 132)',
+          tension: 0.1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: false }
+      }
+    }
+  });
+}
+
+function updateSensorChart() {
+  window.sensorChart.data.datasets[0].data.shift();
+  window.sensorChart.data.datasets[0].data.push(systemState.sensorValues.WATER_LEVEL);
+  
+  window.sensorChart.data.datasets[1].data.shift();
+  window.sensorChart.data.datasets[1].data.push(systemState.sensorValues.PH_LEVEL * 100);
+  
+  window.sensorChart.update();
+}
+
+// Initialize weather system
+function initWeatherSystem() {
+    // Set initial weather
+    const weatherTypes = ['Sunny', 'Cloudy', 'Rainy', 'Windy'];
+    systemState.weather = weatherTypes[0];
+    
+    // Change weather every 2-5 minutes randomly
+    function changeWeather() {
+        const newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+        systemState.weather = newWeather;
+        addLogEntry(`Weather changed to ${newWeather}`);
+        updateAllDisplays();
+        
+        // Schedule next change (between 2-5 minutes)
+        const nextChange = 120000 + Math.random() * 180000; // 2-5 minutes
+        setTimeout(changeWeather, nextChange);
+    }
+    
+    // First change after 2 minutes
+    setTimeout(changeWeather, 120000);
+}
+
+// Call this in your window.onload or initialization function
+window.addEventListener('load', function() {
+    // ... existing initialization code ...
+    
+    // Initialize weather system
+    initWeatherSystem();
+    
+    // Initialize simulation
+    window.simulation = new VisualSimulation('simCanvas');
+});
+
+</script>
+
+<script>
+    class VisualSimulation {
+    constructor(canvasId) {
+        // Canvas setup
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
+        // Simulation control
+        this.isPaused = false;
+        this.timeScale = 1.0;
+        this.lastFrameTime = 0;
+        
+        // Visual elements
+        this.ripples = [];
+        this.weatherParticles = [];
+        this.plants = [
+            { type: 'lettuce', x: 0.4, growth: 0, health: 1 },
+            { type: 'basil', x: 0.6, growth: 0, health: 1 },
+            { type: 'strawberry', x: 0.8, growth: 0, health: 1 }
+        ];
+        
+        // Start animation
+        this.animate();
+    }
+
+    // ======================
+    // CORE ANIMATION METHODS
+    // ======================
+    
+    resizeCanvas() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+    }
+
+    animate() {
+        const now = performance.now();
+        const deltaTime = this.lastFrameTime ? (now - this.lastFrameTime) * this.timeScale : 16;
+        this.lastFrameTime = now;
+
+        if (!this.isPaused) {
+            this.updateEnvironment(deltaTime);
+            this.drawAllComponents();
+        }
+
+        requestAnimationFrame(() => this.animate());
+    }
+
+    // ======================
+    // UPDATE METHODS
+    // ======================
+    
+    updateEnvironment(deltaTime) {
+        // Update water ripples from pump activity
+        if (systemState.waterPump !== 'OFF' && Math.random() < 0.05 * (deltaTime/16)) {
+            this.ripples.push({
+                x: 0.1 + Math.random() * 0.1,
+                y: 0.7 - (systemState.sensorValues.WATER_LEVEL / 1000 * 0.5),
+                radius: 0.005,
+                growthRate: 0.002,
+                alpha: 0.8,
+                lifetime: 1.5
+            });
+        }
+        
+        // Update existing ripples
+        this.ripples.forEach(r => {
+            r.radius += r.growthRate * (deltaTime/16);
+            r.alpha -= 0.01 * (deltaTime/16);
+        });
+        this.ripples = this.ripples.filter(r => r.alpha > 0 && r.radius < 0.2);
+        
+        // Update weather effects
+        this.updateWeatherEffects(deltaTime);
+        
+        // Update plant growth
+        this.updatePlants(deltaTime);
+    }
+
+    updateWeatherEffects(deltaTime) {
+        // Clear old particles
+        this.weatherParticles = this.weatherParticles.filter(p => p.y < this.canvas.height);
+        
+        // Add new particles based on weather
+        if (systemState.weather === 'Rainy' && Math.random() < 0.3 * (deltaTime/16)) {
+            this.weatherParticles.push({
+                x: Math.random() * this.canvas.width,
+                y: -10,
+                speed: 100 + Math.random() * 200,
+                size: 1 + Math.random() * 2
+            });
+        }
+    }
+
+    updatePlants(deltaTime) {
+        // Update plant growth based on system conditions
+        const growthFactor = Math.min(1, 
+            (systemState.sensorValues.NUTRIENT_LEVEL / 500) * 0.6 + 
+            (1 - Math.abs(6.5 - systemState.sensorValues.PH_LEVEL) / 2.5) * 0.4
+        );
+        
+        this.plants.forEach(p => {
+            p.growth += (0.0001 * deltaTime) * growthFactor;
+            p.health = growthFactor;
+        });
+    }
+
+    // ======================
+    // DRAWING METHODS
+    // ======================
+    
+    drawAllComponents() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawSky();
+        this.drawWeather();
+        this.drawGreenhouse();
+        this.drawWaterTank();
+        this.drawPlants();
+    }
+
+    drawSky() {
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height * 0.6);
+        
+        if (systemState.timeOfDay === 'Day') {
+            gradient.addColorStop(0, systemState.weather === 'Sunny' ? '#87CEEB' : '#A9A9A9');
+            gradient.addColorStop(1, systemState.weather === 'Sunny' ? '#E0F7FF' : '#D3D3D3');
+        } else {
+            gradient.addColorStop(0, '#0F0526');
+            gradient.addColorStop(1, '#1A1033');
+        }
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height * 0.6);
+    }
+
+    drawWeather() {
+        // Rain particles
+        if (systemState.weather === 'Rainy') {
+            this.ctx.fillStyle = 'rgba(200, 200, 255, 0.7)';
+            this.weatherParticles.forEach(p => {
+                this.ctx.fillRect(p.x, p.y, p.size, p.size * 3);
+            });
+        }
+        
+        // Clouds for cloudy weather
+        if (systemState.weather === 'Cloudy') {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            for (let i = 0; i < 5; i++) {
+                const x = (this.canvas.width * 0.2) + (i * this.canvas.width * 0.15);
+                const y = this.canvas.height * 0.2;
+                this.drawCloud(x, y, 60);
+            }
+        }
+    }
+
+    drawCloud(x, y, size) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, size * 0.6, 0, Math.PI * 2);
+        this.ctx.arc(x + size * 0.4, y - size * 0.2, size * 0.4, 0, Math.PI * 2);
+        this.ctx.arc(x + size * 0.8, y, size * 0.5, 0, Math.PI * 2);
+        this.ctx.fill();
+    }
+
+    drawGreenhouse() {
+        this.ctx.strokeStyle = '#555';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(
+            this.canvas.width * 0.3, 
+            this.canvas.height * 0.2,
+            this.canvas.width * 0.6,
+            this.canvas.height * 0.5
+        );
+        
+        this.ctx.fillStyle = 'rgba(200, 220, 255, 0.15)';
+        this.ctx.fillRect(
+            this.canvas.width * 0.3, 
+            this.canvas.height * 0.2,
+            this.canvas.width * 0.6,
+            this.canvas.height * 0.5
+        );
+    }
+
+    drawWaterTank() {
+        const waterLevel = systemState.sensorValues.WATER_LEVEL / 1000;
+        const pH = systemState.sensorValues.PH_LEVEL;
+        
+        // Tank outline
+        this.ctx.strokeStyle = '#555';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(
+            this.canvas.width * 0.1,
+            this.canvas.height * 0.5,
+            this.canvas.width * 0.2,
+            this.canvas.height * 0.4
+        );
+        
+        // Water color based on pH
+        let waterColor;
+        if (pH < 5.5) {
+            const acidity = (5.5 - pH) / 3;
+            waterColor = `rgba(255, ${200 - 150 * acidity}, ${200 - 150 * acidity}, 0.7)`;
+        } else if (pH > 7.5) {
+            const alkalinity = (pH - 7.5) / 3;
+            waterColor = `rgba(${200 - 150 * alkalinity}, ${200 - 150 * alkalinity}, 255, 0.7)`;
+        } else {
+            waterColor = 'rgba(100, 200, 255, 0.7)';
+        }
+        
+        // Draw water
+        this.ctx.fillStyle = waterColor;
+        this.ctx.fillRect(
+            this.canvas.width * 0.1,
+            this.canvas.height * 0.5 + this.canvas.height * 0.4 * (1 - waterLevel),
+            this.canvas.width * 0.2,
+            this.canvas.height * 0.4 * waterLevel
+        );
+        
+        // Draw ripples
+        this.ripples.forEach(r => {
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${r.alpha})`;
+            this.ctx.beginPath();
+            this.ctx.arc(
+                this.canvas.width * r.x,
+                this.canvas.height * 0.5 + this.canvas.height * 0.4 * (1 - waterLevel) + this.canvas.height * r.y,
+                r.radius * this.canvas.width,
+                0,
+                Math.PI * 2
+            );
+            this.ctx.stroke();
+        });
+    }
+
+    drawPlants() {
+        this.plants.forEach(plant => {
+            const plantHeight = this.canvas.height * 0.3 * plant.growth;
+            const plantX = this.canvas.width * plant.x;
+            const plantY = this.canvas.height * 0.7;
+            
+            // Stem
+            this.ctx.fillStyle = `hsl(${100 * plant.health}, 80%, 30%)`;
+            this.ctx.fillRect(
+                plantX - 10,
+                plantY - plantHeight,
+                20,
+                plantHeight
+            );
+            
+            // Leaves
+            for (let i = 0; i < 3; i++) {
+                const leafY = plantY - plantHeight + (i * plantHeight / 3);
+                const leafSize = 15 + i * 5;
+                
+                // Left leaf
+                this.ctx.beginPath();
+                this.ctx.moveTo(plantX - 10, leafY);
+                this.ctx.lineTo(plantX - 25, leafY - leafSize/2);
+                this.ctx.lineTo(plantX - 25, leafY + leafSize/2);
+                this.ctx.closePath();
+                this.ctx.fill();
+                
+                // Right leaf
+                this.ctx.beginPath();
+                this.ctx.moveTo(plantX + 10, leafY);
+                this.ctx.lineTo(plantX + 25, leafY - leafSize/2);
+                this.ctx.lineTo(plantX + 25, leafY + leafSize/2);
+                this.ctx.closePath();
+                this.ctx.fill();
+            }
+        });
+    }
+
+    // ======================
+    // CONTROL METHODS
+    // ======================
+    
+    setSpeed(speed) {
+        this.timeScale = speed;
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        return this.isPaused;
+    }
+
+    reset() {
+        this.ripples = [];
+        this.weatherParticles = [];
+        this.plants.forEach(p => p.growth = 0);
+    }
+}
+
+// Initialize in your existing setup code:
+window.addEventListener('load', function() {
+    window.simulation = new VisualSimulation('simCanvas');
+    updateAllDisplays(); // Your existing function
+});
+
+// ======================
+// SIMULATION CONTROLS
+// ======================
+
+// Initialize simulation
+let simulation = new VisualSimulation('simCanvas');
+
+// Speed Up (2x) Button
+document.getElementById('simSpeedUp').addEventListener('click', function() {
+    simulation.setSpeed(2.0);
+    addLogEntry("Simulation speed increased to 2x");
+    this.classList.add('active-control');
+    document.getElementById('simSlowDown').classList.remove('active-control');
+});
+
+// Slow Down (0.5x) Button
+document.getElementById('simSlowDown').addEventListener('click', function() {
+    simulation.setSpeed(0.5);
+    addLogEntry("Simulation speed decreased to 0.5x");
+    this.classList.add('active-control');
+    document.getElementById('simSpeedUp').classList.remove('active-control');
+});
+
+// Pause/Resume Button
+document.getElementById('simPause').addEventListener('click', function() {
+    const isPaused = simulation.togglePause();
+    this.textContent = isPaused ? 'Resume' : 'Pause';
+    addLogEntry(`Simulation ${isPaused ? 'paused' : 'resumed'}`);
+    this.classList.toggle('active-control', isPaused);
+});
+
+// Reset View Button
+document.getElementById('simReset').addEventListener('click', function() {
+    simulation.reset();
+    addLogEntry("Simulation view reset");
+    this.classList.add('active-control');
+    setTimeout(() => this.classList.remove('active-control'), 1000);
+});
+</script>
+
 </body>
 </html>
